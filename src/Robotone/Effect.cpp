@@ -4,7 +4,7 @@ Effect::Effect(const double samplerate, const int downsampling, const double con
   config({
     .sample = 0,
     .samplerate = samplerate,
-    .downsampling = downsampling > 1 ? 1 / double(downsampling) : 1,
+    .downsampling = 1 / static_cast<double>(std::max(downsampling, 1)),
     .concertpitch = concertpitch,
   })
 {
@@ -83,6 +83,7 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
       {
         const double abs = std::abs(dft[i]);
         const double inc = double(i) * config.sample;
+
         std::complex<double> arg = 0;
         double sum = 0;
 
@@ -94,7 +95,7 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
           sum += note.velocity;
         }
 
-        dft[i] = sum > 0 ? (abs / sum) * arg : 0;
+        dft[i] = (sum > 0) ? (abs / sum) * arg : 0;
       }
 
       const float y = sdft->isdft(dft.data());
