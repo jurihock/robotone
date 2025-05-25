@@ -40,7 +40,7 @@ int Effect::latency() const
 
 void Effect::update(int note, double velocity)
 {
-  if (note < 0 || notes.size() <= note)
+  if (note < 0 || static_cast<int>(notes.size()) <= note)
   {
     return;
   }
