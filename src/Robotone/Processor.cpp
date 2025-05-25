@@ -31,7 +31,7 @@ bool Processor::hasEditor() const { return true; }
 juce::AudioProcessorEditor* Processor::createEditor() { return new Editor(*this); }
 
 bool Processor::isMidiEffect() const { return false; }
-bool Processor::acceptsMidi() const { return false; }
+bool Processor::acceptsMidi() const { return true; }
 bool Processor::producesMidi() const { return false; }
 int  Processor::getNumPrograms() { return 1; }
 int  Processor::getCurrentProgram() { return 0; }
