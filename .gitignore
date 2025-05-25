@@ -1,0 +1,11 @@
+.*/
+!.github/
+
+build*/
+cmake-build*/
+
+.DS_Store
+Thumbs.db
+
+*.sublime-workspace
+*.test
