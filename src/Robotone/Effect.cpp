@@ -65,7 +65,7 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
     output.begin(),
     [&](const float x)
     {
-      return x;
+      return x; // TODO latency
     });
 }
 
