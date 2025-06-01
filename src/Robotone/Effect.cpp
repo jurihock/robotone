@@ -10,7 +10,7 @@ Effect::Effect(const double samplerate, const int downsampling, const double con
 {
   // TODO robotone = std::make_unique<Robotone>(samplerate);
 
-  const size_t dftsize = static_cast<size_t>(256 * config.downsampling); // TODO dftsize
+  const size_t dftsize = std::max(static_cast<size_t>(256 * config.downsampling), size_t(1)); // TODO dftsize
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
   dft.resize(sdft->size());
@@ -89,14 +89,16 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
 
         for (const size_t j : mask)
         {
-          const note_t& note = notes[j];
+          const auto& [omg, vel] = notes[j];
 
-          arg += std::polar(note.velocity, note.omega * inc);
-          sum += note.velocity;
+          arg += std::polar(vel, omg * inc);
+          sum += vel;
         }
 
         dft[i] = (sum > 0) ? (abs / sum) * arg : 0;
       }
+
+      dft[0] = dft[dft.size() - 1] = 0;
 
       const float y = sdft->isdft(dft.data());
 
