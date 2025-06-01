@@ -4,7 +4,9 @@
 
 // TODO #include <Robotone/Robotone.h>
 
-#include <sdft/sdft.h>
+#include <Robotone/SDFT/msdft.h>
+// #include <Robotone/SDFT/osdft.h>
+using namespace sdft;
 
 #include <algorithm>
 #include <array>
