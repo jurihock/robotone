@@ -149,7 +149,7 @@ namespace sdft
     void sdft(const T sample, std::complex<F>* const dft)
     {
       F feedback = std::real(analysis.buffer[kernelsize]) * analysis.feedback.first
-                + std::real(analysis.buffer[kernelsize + (dftsize - 1)]) * analysis.feedback.last;
+                 + std::real(analysis.buffer[kernelsize + (dftsize - 1)]) * analysis.feedback.last;
 
       for (size_t i = 1, j = i + kernelsize; i < (dftsize - 1); ++i, ++j)
       {
