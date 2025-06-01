@@ -13,7 +13,6 @@ Effect::Effect(const double samplerate, const int downsampling, const double con
   const size_t dftsize = std::max(static_cast<size_t>(256 * config.downsampling), size_t(1)); // TODO dftsize
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
-  dft.resize(sdft->size());
 
   for (size_t i = 0; i < notes.size(); ++i)
   {
@@ -30,6 +29,7 @@ Effect::Effect(const double samplerate, const int downsampling, const double con
     };
   }
 
+  dft.resize(sdft->size());
   mask.reserve(notes.size());
 }
 
