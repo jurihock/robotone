@@ -284,13 +284,6 @@ namespace sdft
     }
     synthesis;
 
-    inline static T exchange(T& oldvalue, const T newvalue)
-    {
-      const T value = oldvalue;
-      oldvalue = newvalue;
-      return value;
-    }
-
     inline static std::complex<F> convolve(const std::complex<F>* values, const SDFT::Window window, const F weight)
     {
       switch (window)
