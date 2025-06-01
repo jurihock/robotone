@@ -4,6 +4,8 @@
 
   BEGIN_JUCE_JINGLES_NAMESPACE
 
+  #include <juce_core/juce_core.h>
+
   template<typename... Args>
   static inline void juce_jingles_log(const juce::String& log, const juce::String& str, Args&&... args)
   {
