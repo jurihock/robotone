@@ -1,9 +1,8 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_jingles/params/GenericParameterSubscription.h>
 
-#include <Robotone/Utils/Parameters/GenericParameterListener.h>
-#include <Robotone/Utils/Parameters/GenericParameterSubscription.h>
+BEGIN_JUCE_JINGLES_NAMESPACE
 
 class GenericParameterContainer
 {
@@ -15,6 +14,9 @@ public:
     juce::AudioParameterInt*,
     juce::AudioParameterFloat*,
     juce::AudioParameterChoice*>;
+
+  using GenericParameterNotification = std::function<void(
+    AnyRangedAudioParameter)>;
 
   GenericParameterContainer(juce::AudioProcessor& process) :
     process(process)
@@ -41,41 +43,74 @@ public:
     static_assert(missing_template_specialization<T>::value);
   }
 
-  std::shared_ptr<GenericParameterSubscription> subscribe(const std::string& id, const std::function<void()> callback) const
+  void notify(const std::string& ns, std::function<void()> callback)
   {
-    return std::make_shared<GenericParameterSubscription>(get(id), callback);
+    notifications[ns].emplace_back([callback](AnyRangedAudioParameter)
+    {
+      callback();
+    });
+  }
+
+  void notify(const std::string& ns, std::function<void(
+    const std::string& id,
+    const std::variant<bool, int, double, std::string> value)> callback)
+  {
+    notifications[ns].emplace_back([callback](AnyRangedAudioParameter parameter)
+    {
+      auto id = std::visit([](juce::RangedAudioParameter* pointer) {
+        return pointer->getParameterID().toStdString();
+      }, parameter);
+
+      std::visit(visitor{
+        [&](juce::AudioParameterBool*   pointer) { callback(id, *pointer); },
+        [&](juce::AudioParameterInt*    pointer) { callback(id, *pointer); },
+        [&](juce::AudioParameterFloat*  pointer) { callback(id, static_cast<double>(*pointer)); },
+        [&](juce::AudioParameterChoice* pointer) { callback(id, pointer->getCurrentChoiceName().toStdString()); }
+      }, parameter);
+    });
   }
 
 protected:
 
+  template<typename T>
+  struct missing_template_specialization : std::false_type {};
+
+  template<class... T>
+  struct visitor : T... { using T::operator()...; };
+
+  // explicit deduction guide,
+  // which is actually not needed as of C++ 20,
+  // but still required for Apple Clang 15
+  template<class... Ts>
+  visitor(Ts...) -> visitor<Ts...>;
+
   void add(const std::string& ns, AnyRangedAudioParameter parameter)
   {
-    std::visit([ns, parameter, this](auto* pm)
+    std::visit([ns, parameter, this](juce::RangedAudioParameter* pointer)
     {
-      auto id = pm->getParameterID().toStdString();
+      auto id = pointer->getParameterID().toStdString();
 
-      auto callback = [ns, this]()
+      auto callback = [ns, parameter, this]()
       {
-        if (callbacks.contains(ns))
+        const auto& callbacks = notifications.find(ns);
+
+        if (callbacks == notifications.end())
         {
-          for (const auto& callback : callbacks.at(ns))
-          {
-            callback();
-          }
+          return;
+        }
+
+        for (const auto& callback : callbacks->second)
+        {
+          callback(parameter);
         }
       };
 
-      auto subscription = std::make_unique<GenericParameterSubscription>(pm, callback);
+      auto subscription = std::make_unique<GenericParameterSubscription>(pointer, callback);
 
-      parameters[id] = parameter;
+      parameters.emplace(id, parameter);
       subscriptions.push_back(std::move(subscription));
-      process.addParameter(pm);
+      process.addParameter(pointer);
     }, parameter);
-  }
-
-  void call(const std::string& ns, std::function<void()> callback)
-  {
-    callbacks[ns].push_back(std::move(callback));
   }
 
   void visit(std::function<void(const std::string& id, const AnyRangedAudioParameter& parameter)> callback)
@@ -88,14 +123,11 @@ protected:
 
 private:
 
-  template<typename T>
-  struct missing_template_specialization : std::false_type {};
-
   juce::AudioProcessor& process;
 
   std::map<std::string, AnyRangedAudioParameter> parameters;
   std::vector<std::unique_ptr<GenericParameterSubscription>> subscriptions;
-  std::map<std::string, std::vector<std::function<void()>>> callbacks;
+  std::map<std::string, std::vector<GenericParameterNotification>> notifications;
 
 };
 
@@ -184,3 +216,5 @@ inline void GenericParameterContainer::set<std::string>(const std::string& id, c
     *parameter = index;
   }
 }
+
+END_JUCE_JINGLES_NAMESPACE

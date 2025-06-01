@@ -2,9 +2,7 @@
 
 #include <JuceHeader.h>
 
-#include <Robotone/Utils/Parameters/XmlParameters.h>
-
-class Parameters final : public XmlParameters
+class Parameters final : public juce::jingles::XmlParameters
 {
 
 public:

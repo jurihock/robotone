@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+BEGIN_JUCE_JINGLES_NAMESPACE
+
 template<class> struct WellKnownTimerDuration : std::false_type {};
 template<> struct WellKnownTimerDuration<std::chrono::seconds> : std::true_type {};
 template<> struct WellKnownTimerDuration<std::chrono::milliseconds> : std::true_type {};
@@ -21,7 +23,7 @@ class Timer
 
 public:
 
-  Timer(const size_t capacity = 100000)
+  Timer(const size_t capacity = 100100)
   {
     static_assert(WellKnownTimerDuration<T>::value, "s,ms,us,ns");
 
@@ -93,10 +95,10 @@ public:
     const std::string unit = units.at(T::period::num * T::period::den);
 
     const double sum = std::accumulate(data.begin(), data.end(), 0.0);
-    const double sumsum = std::inner_product(data.begin(), data.end(), data.begin(), 0.0);
+    const double prod = std::inner_product(data.begin(), data.end(), data.begin(), 0.0);
 
     const double mean = sum / data.size();
-    const double stdev = std::sqrt(sumsum / data.size() - mean * mean);
+    const double stdev = std::sqrt(prod / data.size() - mean * mean);
 
     std::ostringstream result;
     result.setf(result.flags() | std::ios::fixed);
@@ -108,12 +110,10 @@ public:
 
 private:
 
-  struct
-  {
-    std::chrono::time_point<std::chrono::steady_clock> first, last;
-  }
-  timestamp;
+  struct { std::chrono::time_point<std::chrono::steady_clock> first, last; } timestamp;
 
   std::vector<double> data;
 
 };
+
+END_JUCE_JINGLES_NAMESPACE

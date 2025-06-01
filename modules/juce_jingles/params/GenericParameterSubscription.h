@@ -1,8 +1,8 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_jingles/params/GenericParameterListener.h>
 
-#include <Robotone/Utils/Parameters/GenericParameterListener.h>
+BEGIN_JUCE_JINGLES_NAMESPACE
 
 class GenericParameterSubscription final
 {
@@ -55,3 +55,5 @@ private:
   }
 
 };
+
+END_JUCE_JINGLES_NAMESPACE

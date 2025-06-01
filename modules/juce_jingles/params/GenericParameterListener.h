@@ -1,6 +1,8 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_core/juce_core.h>
+
+BEGIN_JUCE_JINGLES_NAMESPACE
 
 class GenericParameterListener final : public juce::AudioProcessorParameter::Listener
 {
@@ -26,3 +28,5 @@ private:
   const std::function<void()> callback;
 
 };
+
+END_JUCE_JINGLES_NAMESPACE

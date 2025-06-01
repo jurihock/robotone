@@ -1,8 +1,5 @@
 #include <Robotone/Processor.h>
 
-#include <Robotone/Utils/Chronometer.h>
-#include <Robotone/Utils/Logger.h>
-
 Processor::Processor() :
   juce::AudioProcessor(
     juce::AudioProcessor::BusesProperties()
@@ -11,7 +8,7 @@ Processor::Processor() :
 {
   parameters = std::make_unique<Parameters>(*this);
 
-  parameters->onbypass([&]()
+  parameters->notify("bypass", [&]()
   {
     std::lock_guard lock(mutex);
 
@@ -59,14 +56,32 @@ void Processor::getStateInformation(juce::MemoryBlock& data)
 {
   LOG("Save plugin state");
 
-  parameters->save(data);
+  try
+  {
+    parameters->save(data, [](auto xml) { LOG(xml); });
+  }
+  catch(const std::exception& exception)
+  {
+    juce::ignoreUnused(exception);
+
+    LOG(exception.what());
+  }
 }
 
 void Processor::setStateInformation(const void* data, int size)
 {
   LOG("Load plugin state");
 
-  parameters->load(data, size);
+  try
+  {
+    parameters->load(data, size, [](auto xml) { LOG(xml); });
+  }
+  catch(const std::exception& exception)
+  {
+    juce::ignoreUnused(exception);
+
+    LOG(exception.what());
+  }
 }
 
 void Processor::prepareToPlay(double samplerate, int blocksize)
@@ -106,7 +121,7 @@ void Processor::prepareToPlay(double samplerate, int blocksize)
     {
       auto effect = std::make_unique<Effect>(samplerate);
 
-      effects.emplace_back(std::move(effect));
+      effects.push_back(std::move(effect));
 
       if (channel < 1)
       {

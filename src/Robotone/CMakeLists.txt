@@ -49,6 +49,7 @@ target_sources(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
+    juce_jingles
     sdft)
 
 target_link_libraries(${PROJECT_NAME}
@@ -87,21 +88,21 @@ endif()
 
 if(LOGGING)
 
-  message(STATUS "Defining ENABLE_PLUGIN_LOGGER")
+  message(STATUS "Defining ENABLE_JINGLE_LOGGER")
 
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-      -DENABLE_PLUGIN_LOGGER)
+      -DENABLE_JINGLE_LOGGER)
 
 endif()
 
 if(CHRONO)
 
-  message(STATUS "Defining ENABLE_PLUGIN_CHRONOMETER")
+  message(STATUS "Defining ENABLE_JINGLE_CHRONOMETER")
 
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-      -DENABLE_PLUGIN_CHRONOMETER)
+      -DENABLE_JINGLE_CHRONOMETER)
 
 endif()
 

@@ -1,24 +1,26 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_jingles/params/GenericParameterContainer.h>
 
-#include <Robotone/Utils/Logger.h>
-#include <Robotone/Utils/Parameters/GenericParameterContainer.h>
+BEGIN_JUCE_JINGLES_NAMESPACE
 
 class XmlParameters : public GenericParameterContainer
 {
 
 public:
 
-  XmlParameters(juce::AudioProcessor& process, const int schema, const std::string tag = ProjectInfo::projectName) :
+  XmlParameters(juce::AudioProcessor& process, int schema, std::string tag) :
     GenericParameterContainer(process),
     schema(schema),
     tag(std::move(tag))
   {
   }
 
-  void load(const void* data, const int size);
-  void save(juce::MemoryBlock& data);
+  void load(const void* data, const int size,
+            std::optional<std::function<void(const std::string& xml)>> callback = std::nullopt);
+
+  void save(juce::MemoryBlock& data,
+            std::optional<std::function<void(const std::string& xml)>> callback = std::nullopt);
 
 protected:
 
@@ -26,18 +28,6 @@ protected:
   const std::string tag;
 
 private:
-
-  template<typename T>
-  struct missing_template_specialization : std::false_type {};
-
-  template<class... T>
-  struct visitor : T... { using T::operator()...; };
-
-  // explicit deduction guide,
-  // which is actually not needed as of C++ 20,
-  // but still required for Apple Clang 15
-  template<class... Ts>
-  visitor(Ts...) -> visitor<Ts...>;
 
   template<typename T>
   void read(const std::string& id, juce::XmlElement& parent) const
@@ -129,69 +119,65 @@ inline void XmlParameters::write<std::string>(const std::string& id, juce::XmlEl
   child->addTextElement(juce::String(get<std::string>(id)));
 }
 
-inline void XmlParameters::load(const void* data, const int size)
+inline void XmlParameters::load(const void* data, const int size,
+                                std::optional<std::function<void(const std::string& xml)>> callback)
 {
-  try
+  auto xml = std::unique_ptr<juce::XmlElement>(
+    juce::AudioProcessor::getXmlFromBinary(data, size));
+
+  if (!xml)
   {
-    auto xml = std::unique_ptr<juce::XmlElement>(
-      juce::AudioProcessor::getXmlFromBinary(data, size));
-
-    if (xml)
-    {
-      LOG(xml->toString(juce::XmlElement::TextFormat().withoutHeader()));
-    }
-    else
-    {
-      return;
-    }
-
-    if (xml->hasTagName(tag) != true) { return; }
-    if (xml->getIntAttribute("schema") != schema) { return; }
-
-    visit([&](const std::string& id, const AnyRangedAudioParameter& parameter)
-    {
-      std::visit(visitor{
-        [&](juce::AudioParameterBool*)   { read<bool>(id, *xml);        },
-        [&](juce::AudioParameterInt*)    { read<int>(id, *xml);         },
-        [&](juce::AudioParameterFloat*)  { read<float>(id, *xml);       },
-        [&](juce::AudioParameterChoice*) { read<std::string>(id, *xml); }
-      }, parameter);
-    });
+    return;
   }
-  catch(const std::exception& exception)
+
+  if (callback)
   {
-    juce::ignoreUnused(exception);
+    const auto format = juce::XmlElement::TextFormat().withoutHeader();
+    const auto text = xml->toString(format).toStdString();
 
-    LOG(exception.what());
+    (*callback)(text);
   }
+
+  if (xml->hasTagName(tag) != true) { return; }
+  if (xml->getIntAttribute("schema") != schema) { return; }
+
+  visit([&](const std::string& id, const AnyRangedAudioParameter& parameter)
+  {
+    std::visit(visitor{
+      [&](juce::AudioParameterBool*)   { read<bool>(id, *xml);        },
+      [&](juce::AudioParameterInt*)    { read<int>(id, *xml);         },
+      [&](juce::AudioParameterFloat*)  { read<float>(id, *xml);       },
+      [&](juce::AudioParameterChoice*) { read<std::string>(id, *xml); }
+    }, parameter);
+  });
 }
 
-inline void XmlParameters::save(juce::MemoryBlock& data)
+inline void XmlParameters::save(juce::MemoryBlock& data,
+                                std::optional<std::function<void(const std::string& xml)>> callback)
 {
-  try
+  auto xml = std::make_unique<juce::XmlElement>(juce::String(tag));
+
+  xml->setAttribute("schema", schema);
+
+  visit([&](const std::string& id, const AnyRangedAudioParameter& parameter)
   {
-    auto xml = std::make_unique<juce::XmlElement>(juce::String(tag));
+    std::visit(visitor{
+      [&](juce::AudioParameterBool*)   { write<bool>(id, *xml);        },
+      [&](juce::AudioParameterInt*)    { write<int>(id, *xml);         },
+      [&](juce::AudioParameterFloat*)  { write<float>(id, *xml);       },
+      [&](juce::AudioParameterChoice*) { write<std::string>(id, *xml); }
+    }, parameter);
+  });
 
-    xml->setAttribute("schema", schema);
-
-    visit([&](const std::string& id, const AnyRangedAudioParameter& parameter)
-    {
-      std::visit(visitor{
-        [&](juce::AudioParameterBool*)   { write<bool>(id, *xml);        },
-        [&](juce::AudioParameterInt*)    { write<int>(id, *xml);         },
-        [&](juce::AudioParameterFloat*)  { write<float>(id, *xml);       },
-        [&](juce::AudioParameterChoice*) { write<std::string>(id, *xml); }
-      }, parameter);
-    });
-
-    LOG(xml->toString(juce::XmlElement::TextFormat().withoutHeader()));
-
-    juce::AudioProcessor::copyXmlToBinary(*xml, data);
-  }
-  catch(const std::exception& exception)
+  if (callback)
   {
-    juce::ignoreUnused(exception);
+    const auto format = juce::XmlElement::TextFormat().withoutHeader();
+    const auto text = xml->toString(format).toStdString();
 
-    LOG(exception.what());
+    (*callback)(text);
   }
+
+  juce::AudioProcessor::copyXmlToBinary(*xml, data);
 }
+
+END_JUCE_JINGLES_NAMESPACE
