@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -11,27 +12,28 @@
 
 BEGIN_JUCE_JINGLES_NAMESPACE
 
-template<class> struct WellKnownTimerDuration : std::false_type {};
-template<> struct WellKnownTimerDuration<std::chrono::seconds> : std::true_type {};
-template<> struct WellKnownTimerDuration<std::chrono::milliseconds> : std::true_type {};
-template<> struct WellKnownTimerDuration<std::chrono::microseconds> : std::true_type {};
-template<> struct WellKnownTimerDuration<std::chrono::nanoseconds> : std::true_type {};
-
 template<class T>
-class Timer
+class Timer final
 {
+
+  template<class> struct SupportedTimerUnit : std::false_type {};
+  template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type {};
+  template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type {};
+  template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type {};
+  template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type {};
+  static_assert(SupportedTimerUnit<T>::value, "s,ms,us,ns");
 
 public:
 
-  Timer(const size_t capacity = 100100)
+  Timer(const size_t capacity = 1024 * 1024 / sizeof(double))
   {
-    static_assert(WellKnownTimerDuration<T>::value, "s,ms,us,ns");
-
     data.reserve(capacity);
   }
 
   Timer(const Timer& other)
   {
+    time = other.time;
+
     data.reserve(other.data.capacity());
     data.assign(other.data.begin(), other.data.end());
   }
@@ -58,7 +60,7 @@ public:
       return 0;
     }
 
-    const std::chrono::steady_clock::duration duration = std::chrono::steady_clock::now() - timestamp.first;
+    const std::chrono::steady_clock::duration duration = std::chrono::steady_clock::now() - time.front();
     const double value = std::chrono::duration_cast<T>(duration * 1e+3).count() * 1e-3;
 
     return value;
@@ -66,17 +68,17 @@ public:
 
   void tic()
   {
-    timestamp.last = std::chrono::steady_clock::now();
+    time.back() = std::chrono::steady_clock::now();
 
     if (data.empty())
     {
-      timestamp.first = timestamp.last;
+      time.front() = time.back();
     }
   }
 
   void toc()
   {
-    const std::chrono::steady_clock::duration duration = std::chrono::steady_clock::now() - timestamp.last;
+    const std::chrono::steady_clock::duration duration = std::chrono::steady_clock::now() - time.back();
     const double value = std::chrono::duration_cast<T>(duration * 1e+3).count() * 1e-3;
 
     data.push_back(value);
@@ -84,11 +86,11 @@ public:
 
   std::string str()
   {
-    const std::map<intmax_t, std::string> units =
+    static const std::map<intmax_t, std::string> units =
     {
-      { 1000000000, "ns" },
-      { 1000000, "us" },
-      { 1000, "ms" },
+      { 1'000'000'000, "ns" },
+      { 1'000'000, "us" },
+      { 1'000, "ms" },
       { 1, "s" }
     };
 
@@ -110,8 +112,7 @@ public:
 
 private:
 
-  struct { std::chrono::time_point<std::chrono::steady_clock> first, last; } timestamp;
-
+  std::array<std::chrono::time_point<std::chrono::steady_clock>, 2> time;
   std::vector<double> data;
 
 };
