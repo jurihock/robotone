@@ -13,29 +13,15 @@
 BEGIN_JUCE_JINGLES_NAMESPACE
 
 template<class> struct SupportedTimerUnit : std::false_type
-{
-  static constexpr const char unit[] = "n.a.";
-};
-
+{ static constexpr const char unit[] = "n.a."; };
 template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type
-{
-  static constexpr const char unit[] = "s";
-};
-
+{ static constexpr const char unit[] = "s"; };
 template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type
-{
-  static constexpr const char unit[] = "ms";
-};
-
+{ static constexpr const char unit[] = "ms"; };
 template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type
-{
-  static constexpr const char unit[] = "us";
-};
-
+{ static constexpr const char unit[] = "us"; };
 template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type
-{
-  static constexpr const char unit[] = "ns";
-};
+{ static constexpr const char unit[] = "ns"; };
 
 template<class T>
 class Timer final
