@@ -20,6 +20,7 @@ private:
 public:
 
   Processor();
+  virtual ~Processor() = default;
 
   const juce::String getName() const override;
 

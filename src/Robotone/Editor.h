@@ -8,6 +8,7 @@ class Editor final : public juce::GenericAudioProcessorEditor
 public:
 
   Editor(juce::AudioProcessor& process);
+  virtual ~Editor() = default;
 
 private:
 
