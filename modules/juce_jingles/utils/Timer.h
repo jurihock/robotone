@@ -12,11 +12,30 @@
 
 BEGIN_JUCE_JINGLES_NAMESPACE
 
-template<class> struct SupportedTimerUnit : std::false_type {};
-template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type {};
-template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type {};
-template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type {};
-template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type {};
+template<class> struct SupportedTimerUnit : std::false_type
+{
+  static constexpr const char unit[] = "n.a.";
+};
+
+template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type
+{
+  static constexpr const char unit[] = "s";
+};
+
+template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type
+{
+  static constexpr const char unit[] = "ms";
+};
+
+template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type
+{
+  static constexpr const char unit[] = "us";
+};
+
+template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type
+{
+  static constexpr const char unit[] = "ns";
+};
 
 template<class T>
 class Timer final
@@ -85,17 +104,9 @@ public:
     data.push_back(value);
   }
 
-  std::string str()
+  std::string str() const
   {
-    static const std::map<intmax_t, std::string> units =
-    {
-      { 1'000'000'000, "ns" },
-      { 1'000'000, "us" },
-      { 1'000, "ms" },
-      { 1, "s" }
-    };
-
-    const std::string unit = units.at(T::period::num * T::period::den);
+    static const std::string unit = SupportedTimerUnit<T>::unit;
 
     const double sum = std::accumulate(data.begin(), data.end(), 0.0);
     const double prod = std::inner_product(data.begin(), data.end(), data.begin(), 0.0);
