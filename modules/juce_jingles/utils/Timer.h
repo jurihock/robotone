@@ -12,15 +12,16 @@
 
 BEGIN_JUCE_JINGLES_NAMESPACE
 
+template<class> struct SupportedTimerUnit : std::false_type {};
+template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type {};
+template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type {};
+template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type {};
+template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type {};
+
 template<class T>
 class Timer final
 {
 
-  template<class> struct SupportedTimerUnit : std::false_type {};
-  template<> struct SupportedTimerUnit<std::chrono::seconds> : std::true_type {};
-  template<> struct SupportedTimerUnit<std::chrono::milliseconds> : std::true_type {};
-  template<> struct SupportedTimerUnit<std::chrono::microseconds> : std::true_type {};
-  template<> struct SupportedTimerUnit<std::chrono::nanoseconds> : std::true_type {};
   static_assert(SupportedTimerUnit<T>::value, "s,ms,us,ns");
 
 public:
