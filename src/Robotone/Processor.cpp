@@ -1,13 +1,7 @@
 #include <Robotone/Processor.h>
 
-Processor::Processor() :
-  juce::AudioProcessor(
-    juce::AudioProcessor::BusesProperties()
-      .withInput("Input",   juce::AudioChannelSet::stereo(), true)
-      .withOutput("Output", juce::AudioChannelSet::stereo(), true))
+Processor::Processor()
 {
-  parameters = std::make_unique<Parameters>(*this);
-
   parameters->notify("bypass", [&]()
   {
     std::lock_guard lock(mutex);
@@ -16,72 +10,19 @@ Processor::Processor() :
   });
 }
 
-const juce::String Processor::getName() const
+bool Processor::acceptsMidi() const
 {
-  return juce::String::formatted(
-    "%s v%s",
-    ProjectInfo::projectName,
-    ProjectInfo::versionString);
-}
-
-bool Processor::hasEditor() const { return true; }
-juce::AudioProcessorEditor* Processor::createEditor() { return new Editor(*this); }
-
-bool Processor::isMidiEffect() const { return false; }
-bool Processor::acceptsMidi() const { return true; }
-bool Processor::producesMidi() const { return false; }
-int  Processor::getNumPrograms() { return 1; }
-int  Processor::getCurrentProgram() { return 0; }
-void Processor::setCurrentProgram(int index) { juce::ignoreUnused(index); }
-void Processor::changeProgramName(int index, const juce::String& name) { juce::ignoreUnused(index, name); }
-const juce::String Processor::getProgramName(int index) { juce::ignoreUnused(index); return {}; }
-
-double Processor::getTailLengthSeconds() const { return 0; }
-juce::AudioProcessorParameter* Processor::getBypassParameter() const { return parameters->get("bypass"); }
-
-bool Processor::isBusesLayoutSupported(const BusesLayout& layouts) const
-{
-  if (layouts.getMainInputChannelSet() != juce::AudioChannelSet::mono() &&
-      layouts.getMainInputChannelSet() != juce::AudioChannelSet::stereo())
-    return false;
-
-  if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono() &&
-      layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
-    return false;
-
   return true;
 }
 
-void Processor::getStateInformation(juce::MemoryBlock& data)
+void Processor::releaseResources()
 {
-  LOG("Save plugin state");
+  std::lock_guard lock(mutex);
 
-  try
-  {
-    parameters->save(data, [](auto xml) { LOG(xml); });
-  }
-  catch(const std::exception& exception)
-  {
-    juce::ignoreUnused(exception);
+  LOG("Release resources");
 
-    LOG(exception.what());
-  }
-}
-
-void Processor::setStateInformation(const void* data, int size)
-{
-  LOG("Load plugin state");
-
-  try
-  {
-    parameters->load(data, size, [](auto xml) { LOG(xml); });
-  }
-  catch(const std::exception& exception)
-  {
-    juce::ignoreUnused(exception);
-
-    LOG(exception.what());
-  }
+  config.reset();
+  effects.clear();
 }
 
 void Processor::prepareToPlay(double samplerate, int blocksize)
@@ -141,16 +82,6 @@ void Processor::prepareToPlay(double samplerate, int blocksize)
 
     effects.clear();
   }
-}
-
-void Processor::releaseResources()
-{
-  std::lock_guard lock(mutex);
-
-  LOG("Release resources");
-
-  config.reset();
-  effects.clear();
 }
 
 void Processor::processBlock(juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi)

@@ -1,4 +1,4 @@
-#include <Robotone/Plugin.h>
+#include <JuceHeader.h>
 
 #include <Robotone/Processor.h>
 

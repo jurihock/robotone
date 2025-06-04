@@ -9,7 +9,7 @@ class XmlParameters : public GenericParameterContainer
 
 public:
 
-  XmlParameters(juce::AudioProcessor& process, int schema, std::string tag) :
+  XmlParameters(juce::AudioProcessor& process, int schema = 1, std::string tag = JUCE_JINGLES_PROJECT) :
     GenericParameterContainer(process),
     schema(schema),
     tag(std::move(tag))

@@ -22,7 +22,7 @@
 
   END_JUCE_JINGLES_NAMESPACE
 
-  #define LOG(...) do { JUCE_JINGLES_NAMESPACE::juce_jingles_log(ProjectInfo::projectName, __VA_ARGS__); } while (false)
+  #define LOG(...) do { JUCE_JINGLES_NAMESPACE::juce_jingles_log(JUCE_JINGLES_PROJECT, __VA_ARGS__); } while (false)
 
 #else
 

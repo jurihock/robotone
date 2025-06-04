@@ -1,7 +1,7 @@
 #include <Robotone/Parameters.h>
 
 Parameters::Parameters(juce::AudioProcessor& process) :
-  XmlParameters(process, 1, ProjectInfo::projectName)
+  XmlParameters(process)
 {
   add("bypass", new juce::AudioParameterBool(
     { "bypass", schema }, "Bypass", false,
