@@ -4,7 +4,7 @@ Processor::Processor()
 {
 }
 
-std::unique_ptr<Effect> Processor::createEffect(const int channel, const double samplerate, const int blocksize)
+std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const double samplerate, const size_t blocksize)
 {
   return std::make_unique<Effect>(samplerate);
 }

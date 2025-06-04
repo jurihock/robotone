@@ -156,7 +156,7 @@ public:
     {
       for (size_t channel = 0; channel < effects.size(); ++channel) // TODO
       {
-        auto effect = createEffect(channel, samplerate, blocksize);
+        auto effect = createEffect(channel, samplerate, size_t(blocksize));
 
         effects.at(channel) = std::move(effect);
 
@@ -285,7 +285,7 @@ public:
     }
   }
 
-  virtual std::unique_ptr<Effect> createEffect(const int channel, const double samplerate, const int blocksize) = 0;
+  virtual std::unique_ptr<Effect> createEffect(const size_t channel, const double samplerate, const size_t blocksize) = 0;
   virtual void processMidi(const juce::MidiBuffer& midi) {}
 
 protected:

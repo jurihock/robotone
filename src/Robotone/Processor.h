@@ -14,7 +14,7 @@ public:
   Processor();
   virtual ~Processor() = default;
 
-  std::unique_ptr<Effect> createEffect(const int channel, const double samplerate, const int blocksize) override;
+  std::unique_ptr<Effect> createEffect(const size_t channel, const double samplerate, const size_t blocksize) override;
 
   bool acceptsMidi() const override;
   void processMidi(const juce::MidiBuffer& midi) override;

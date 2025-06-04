@@ -12,7 +12,7 @@ public:
   AudioEffect() = default;
   virtual ~AudioEffect() = default;
 
-  virtual bool accepts(const int blocksize) const { return true; }
+  virtual bool accepts(const size_t blocksize) const { return true; }
   virtual int latency() const { return 0; }
 
   virtual void dry(const std::span<const float> input, const std::span<float> output) = 0;
