@@ -45,12 +45,13 @@ END_JUCE_JINGLES_NAMESPACE
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include <juce_jingles/audio/AudioEffect.h>
+#include <juce_jingles/audio/AudioEffectProcessor.h>
+
 #include <juce_jingles/params/GenericParameterContainer.h>
 #include <juce_jingles/params/GenericParameterListener.h>
 #include <juce_jingles/params/GenericParameterSubscription.h>
 #include <juce_jingles/params/XmlParameters.h>
-
-#include <juce_jingles/procs/StereoProcessor.h>
 
 #include <juce_jingles/utils/Chronometer.h>
 #include <juce_jingles/utils/Logger.h>

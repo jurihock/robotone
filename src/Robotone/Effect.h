@@ -17,19 +17,20 @@ using namespace sdft;
 #include <span>
 #include <vector>
 
-class Effect final
+class Effect final : public juce::jingles::AudioEffect
 {
 
 public:
 
   Effect(const double samplerate, const int downsampling = 2, const double concertpitch = 440);
+  virtual ~Effect() = default;
 
-  int latency() const;
+  int latency() const override;
 
   void update(int note, double velocity);
 
-  void dry(const std::span<const float> input, const std::span<float> output);
-  void wet(const std::span<const float> input, const std::span<float> output);
+  void dry(const std::span<const float> input, const std::span<float> output) override;
+  void wet(const std::span<const float> input, const std::span<float> output) override;
 
 private:
 
