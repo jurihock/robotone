@@ -68,14 +68,12 @@ public:
       }, parameter);
 
       if (id != ns)
-      {
         return;
-      }
 
       std::visit(visitor{
-        [&](juce::AudioParameterBool*   pointer) { callback(*pointer); },
-        [&](juce::AudioParameterInt*    pointer) { callback(*pointer); },
-        [&](juce::AudioParameterFloat*  pointer) { callback(static_cast<double>(*pointer)); },
+        [&](juce::AudioParameterBool*   pointer) { callback(pointer->get()); },
+        [&](juce::AudioParameterInt*    pointer) { callback(pointer->get()); },
+        [&](juce::AudioParameterFloat*  pointer) { callback(static_cast<double>(pointer->get())); },
         [&](juce::AudioParameterChoice* pointer) { callback(pointer->getCurrentChoiceName().toStdString()); }
       }, parameter);
     });
@@ -92,9 +90,9 @@ public:
       }, parameter);
 
       std::visit(visitor{
-        [&](juce::AudioParameterBool*   pointer) { callback(id, *pointer); },
-        [&](juce::AudioParameterInt*    pointer) { callback(id, *pointer); },
-        [&](juce::AudioParameterFloat*  pointer) { callback(id, static_cast<double>(*pointer)); },
+        [&](juce::AudioParameterBool*   pointer) { callback(id, pointer->get()); },
+        [&](juce::AudioParameterInt*    pointer) { callback(id, pointer->get()); },
+        [&](juce::AudioParameterFloat*  pointer) { callback(id, static_cast<double>(pointer->get())); },
         [&](juce::AudioParameterChoice* pointer) { callback(id, pointer->getCurrentChoiceName().toStdString()); }
       }, parameter);
     });
