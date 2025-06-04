@@ -4,8 +4,7 @@
 build*/
 cmake-build*/
 
+modules/juce_jingles/
+
 .DS_Store
 Thumbs.db
-
-*.sublime-workspace
-*.test
