@@ -3,7 +3,7 @@
 Editor::Editor(juce::AudioProcessor& process) :
   juce::GenericAudioProcessorEditor(process)
 {
-  const int w = int(850 / 1.618), h = 850;
+  const int w = 640, h = 480;
 
   setSize(w, h);
 }

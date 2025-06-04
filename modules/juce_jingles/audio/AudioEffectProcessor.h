@@ -10,14 +10,14 @@
 
 BEGIN_JUCE_JINGLES_NAMESPACE
 
-template<typename Parameters, typename Editor, typename Effect, size_t Channels>
+template<size_t Channels, typename Effect, typename Parameters, typename Editor>
 class AudioEffectProcessor : public juce::AudioProcessor
 {
 
+  static_assert((Channels == 1) || (Channels == 2));
+  static_assert(std::is_convertible<Effect*, AudioEffect*>::value);
   static_assert(std::is_convertible<Parameters*, XmlParameters*>::value);
   static_assert(std::is_convertible<Editor*, juce::AudioProcessorEditor*>::value);
-  static_assert(std::is_convertible<Effect*, AudioEffect*>::value);
-  static_assert((Channels == 1) || (Channels == 2));
 
 public:
 
@@ -154,7 +154,7 @@ public:
 
     try
     {
-      for (auto channel = 0; channel < effects.size(); ++channel) // TODO
+      for (size_t channel = 0; channel < effects.size(); ++channel) // TODO
       {
         auto effect = createEffect(channel, samplerate, blocksize);
 

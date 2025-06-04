@@ -6,7 +6,7 @@
 #include <Robotone/Effect.h>
 #include <Robotone/Parameters.h>
 
-class Processor final : public juce::jingles::AudioEffectProcessor<Parameters, Editor, Effect, 1>
+class Processor final : public juce::jingles::AudioEffectProcessor<1, Effect, Parameters, Editor>
 {
 
 public:
