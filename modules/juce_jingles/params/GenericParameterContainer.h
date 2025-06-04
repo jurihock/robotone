@@ -25,10 +25,17 @@ public:
 
   juce::RangedAudioParameter* get(const std::string& id) const
   {
+    auto parameter = parameters.find(id);
+
+    if (parameter == parameters.end())
+    {
+      return nullptr;
+    }
+
     return std::visit(
       [](juce::RangedAudioParameter* parameter)
       { return parameter; },
-      parameters.at(id));
+      parameter->second);
   }
 
   template<typename T>
