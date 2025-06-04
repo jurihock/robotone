@@ -1,1 +1,0 @@
-juce_add_module(juce_jingles)

@@ -6,4 +6,8 @@ CPMAddPackage(
   GIT_TAG main
   GITHUB_REPOSITORY jurihock/juce_jingles
   DOWNLOAD_ONLY YES
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}/modules/juce_jingles")
+  SOURCE_DIR "${CPM_SOURCE_CACHE}/juce_jingles")
+
+if(juce_jingles_ADDED)
+  juce_add_module("${juce_jingles_SOURCE_DIR}")
+endif()
