@@ -28,7 +28,7 @@ public:
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
     parameters(*this)
   {
-    parameters.notify("bypass", [&](auto id, auto value)
+    parameters.notify("bypass", [&](auto value)
     {
       std::lock_guard lock(mutex);
       bypass = std::get<bool>(value);

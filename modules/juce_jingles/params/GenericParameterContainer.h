@@ -59,6 +59,29 @@ public:
   }
 
   void notify(const std::string& ns, std::function<void(
+    const std::variant<bool, int, double, std::string> value)> callback)
+  {
+    notifications[ns].emplace_back([callback, ns](AnyRangedAudioParameter parameter)
+    {
+      auto id = std::visit([](juce::RangedAudioParameter* pointer) {
+        return pointer->getParameterID().toStdString();
+      }, parameter);
+
+      if (id != ns)
+      {
+        return;
+      }
+
+      std::visit(visitor{
+        [&](juce::AudioParameterBool*   pointer) { callback(*pointer); },
+        [&](juce::AudioParameterInt*    pointer) { callback(*pointer); },
+        [&](juce::AudioParameterFloat*  pointer) { callback(static_cast<double>(*pointer)); },
+        [&](juce::AudioParameterChoice* pointer) { callback(pointer->getCurrentChoiceName().toStdString()); }
+      }, parameter);
+    });
+  }
+
+  void notify(const std::string& ns, std::function<void(
     const std::string& id,
     const std::variant<bool, int, double, std::string> value)> callback)
   {
