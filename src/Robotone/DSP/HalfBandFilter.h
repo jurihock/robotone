@@ -55,7 +55,7 @@ public:
 
       for (size_t i = 0; i < coeffs.size(); ++i)
       {
-        if (i)
+        if (i > 0)
         {
           str << ", ";
         }
