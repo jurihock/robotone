@@ -1,16 +1,29 @@
 #include <Robotone/Effect.h>
 
-Effect::Effect(const double samplerate, const int downsampling, const double concertpitch) :
+Effect::Effect(const double samplerate, const double concertpitch) :
   config({
     .sample = 0,
     .samplerate = samplerate,
-    .downsampling = 1 / static_cast<double>(std::max(downsampling, 1)),
     .concertpitch = concertpitch,
+    .milliseconds = 10,
+    .decimation = 0
   })
 {
-  // TODO robotone = std::make_unique<Robotone>(samplerate);
+  mask.reserve(notes.size());
+  reset();
+}
 
-  const size_t dftsize = std::max(static_cast<size_t>(256 * config.downsampling), size_t(1)); // TODO dftsize
+int Effect::latency() const
+{
+  return 0; // TODO: latency
+}
+
+void Effect::reset()
+{
+  const double window = (config.milliseconds * 1e-3) / config.samplerate;
+  const double factor = 0.5 / (config.decimation + 1);
+
+  const size_t dftsize = std::max(static_cast<size_t>(window * factor), size_t(1));
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
@@ -30,12 +43,19 @@ Effect::Effect(const double samplerate, const int downsampling, const double con
   }
 
   dft.resize(sdft->size());
-  mask.reserve(notes.size());
+  std::fill(dft.begin(), dft.end(), 0);
 }
 
-int Effect::latency() const
+void Effect::milliseconds(int value)
 {
-  return 0; // TODO robotone->latency();
+  config.milliseconds = value;
+  reset();
+}
+
+void Effect::decimation(int value)
+{
+  config.decimation = value;
+  reset();
 }
 
 void Effect::update(int note, double velocity)
@@ -65,7 +85,7 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
     output.begin(),
     [&](const float x)
     {
-      return x; // TODO latency
+      return x; // TODO: latency
     });
 }
 

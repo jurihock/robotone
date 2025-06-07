@@ -2,6 +2,25 @@
 
 Processor::Processor()
 {
+  parameters.notify("milliseconds", [&](auto value)
+  {
+    std::lock_guard lock(mutex);
+
+    for (size_t i = 0; i < effects.size(); ++i)
+    {
+      effects[i]->milliseconds(std::get<int>(value));
+    }
+  });
+
+  parameters.notify("decimation", [&](auto value)
+  {
+    std::lock_guard lock(mutex);
+
+    for (size_t i = 0; i < effects.size(); ++i)
+    {
+      effects[i]->decimation(std::get<int>(value));
+    }
+  });
 }
 
 std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const double samplerate, const size_t blocksize)

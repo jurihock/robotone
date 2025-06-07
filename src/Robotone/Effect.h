@@ -2,8 +2,6 @@
 
 #include <JuceHeader.h>
 
-// TODO #include <Robotone/Robotone.h>
-
 #include <Robotone/SDFT/msdft.h>
 // #include <Robotone/SDFT/osdft.h>
 using namespace sdft;
@@ -22,10 +20,15 @@ class Effect final : public juce::jingles::AudioEffect
 
 public:
 
-  Effect(const double samplerate, const int downsampling = 2, const double concertpitch = 440);
+  Effect(const double samplerate, const double concertpitch = 440);
   virtual ~Effect() = default;
 
   int latency() const override;
+
+  void reset();
+
+  void milliseconds(int value);
+  void decimation(int value);
 
   void update(int note, double velocity);
 
@@ -34,13 +37,14 @@ public:
 
 private:
 
-  struct
+  struct config_t
   {
     uint64_t sample;
     double samplerate;
-    double downsampling;
     double concertpitch;
-  } config;
+    int milliseconds;
+    int decimation;
+  };
 
   struct note_t
   {
@@ -48,7 +52,7 @@ private:
     double velocity;
   };
 
-  // TODO std::unique_ptr<Robotone> robotone;
+  config_t config;
 
   std::unique_ptr<SDFT<float, double>> sdft;
   std::vector<std::complex<double>> dft;
