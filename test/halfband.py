@@ -26,11 +26,13 @@ sinc[N//2] = 1/2
 b = sinc * win
 print(b)
 
-w, h = freqz(b, worN=1024, fs=44100)
+fs = 44100
+w, h = freqz(b, fs=fs)
 h = 20 * np.log10(np.abs(h))
 
 plot.figure(f'{taps} taps')
-plot.plot(w, h)
+plot.plot(w, h, color='blue')
+plot.axvline(fs/4, color='magenta')
 plot.xlabel('Hz')
 plot.ylabel('dB')
 plot.show()
