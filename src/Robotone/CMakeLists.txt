@@ -1,6 +1,6 @@
 project(Robotone
-        DESCRIPTION "TODO"
-        VERSION 1.0)
+  DESCRIPTION "Make the human voice sound robotic"
+  VERSION 1.0)
 
 set(FORMATS Standalone VST3)
 
