@@ -19,10 +19,12 @@ int Effect::latency() const
 
 void Effect::reset()
 {
-  const double window = (config.milliseconds * 1e-3) / config.samplerate;
+  const double window = 1e-3 * config.milliseconds * config.samplerate;
   const double factor = 0.5 / (config.decimation + 1);
-
   const size_t dftsize = static_cast<size_t>(std::max(window * factor, 1.0));
+
+  LOG("Effect millis %d window %f factor %f dftsize %zu",
+    config.milliseconds, window, factor, dftsize);
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
@@ -51,13 +53,11 @@ void Effect::reset()
 void Effect::milliseconds(int value)
 {
   config.milliseconds = value;
-  reset();
 }
 
 void Effect::decimation(int value)
 {
   config.decimation = value;
-  reset();
 }
 
 void Effect::update(int note, double velocity)

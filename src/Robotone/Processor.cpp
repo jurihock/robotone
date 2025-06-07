@@ -8,7 +8,11 @@ Processor::Processor()
 
     for (size_t i = 0; i < effects.size(); ++i)
     {
-      effects[i]->milliseconds(std::get<int>(value));
+      if (effects[i])
+      {
+        effects[i]->milliseconds(std::get<int>(value));
+        effects[i]->reset();
+      }
     }
   });
 
@@ -18,14 +22,24 @@ Processor::Processor()
 
     for (size_t i = 0; i < effects.size(); ++i)
     {
-      effects[i]->decimation(std::get<int>(value));
+      if (effects[i])
+      {
+        effects[i]->decimation(std::get<int>(value));
+        effects[i]->reset();
+      }
     }
   });
 }
 
 std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const double samplerate, const size_t blocksize)
 {
-  return std::make_unique<Effect>(samplerate);
+  auto effect = std::make_unique<Effect>(samplerate);
+
+  effect->milliseconds(parameters.get<int>("milliseconds"));
+  effect->decimation(parameters.get<int>("decimation"));
+  effect->reset();
+
+  return effect;
 }
 
 bool Processor::acceptsMidi() const
