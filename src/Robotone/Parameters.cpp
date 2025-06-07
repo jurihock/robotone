@@ -12,6 +12,6 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     juce::AudioParameterIntAttributes().withLabel("ms")));
 
   add("decimation", new juce::AudioParameterInt(
-    { "decimation", schema }, "Recimation ratio", 0, 4, 0,
+    { "decimation", schema }, "Decimation ratio", 0, 4, 0,
     juce::AudioParameterIntAttributes().withLabel("")));
 }
