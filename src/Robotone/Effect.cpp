@@ -9,6 +9,12 @@ Effect::Effect(const double samplerate, const double concertpitch) :
     .octave = 0
   })
 {
+  hbf = std::make_unique<HalfBandFilter<float, double>>();
+  {
+    const auto str = hbf->str();
+    LOG("HBF %s", str.c_str());
+  }
+
   reset();
 }
 
@@ -97,8 +103,13 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
     input.begin(),
     input.end(),
     output.begin(),
-    [&](const float x)
+    [&](float x)
     {
+      if (hbf)
+      {
+        x = hbf->filter(x);
+      }
+
       sdft->sdft(x, dft.data());
 
       for (size_t i = 1; i < dft.size() - 1; ++i)

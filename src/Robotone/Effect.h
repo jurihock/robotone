@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include <Robotone/DSP/HalfBandFilter.h>
+
 // #include <Robotone/SDFT/msdft.h>
 #include <Robotone/SDFT/osdft.h>
 using namespace sdft;
@@ -53,6 +55,8 @@ private:
   };
 
   config_t config;
+
+  std::unique_ptr<HalfBandFilter<float, double>> hbf;
 
   std::unique_ptr<SDFT<float, double>> sdft;
   std::vector<std::complex<double>> dft;
