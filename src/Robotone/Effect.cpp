@@ -2,11 +2,15 @@
 
 Effect::Effect(const double samplerate, const double concertpitch) :
   config({
-    .sample = 0,
     .samplerate = samplerate,
     .concertpitch = concertpitch,
+    .decimate = false,
     .millis = 10,
-    .octave = 0
+    .octave = 0,
+  }),
+  buffer({
+    .sample = 0,
+    .value = 0,
   })
 {
   hbf = std::make_unique<HalfBandFilter<float, double>>();
@@ -25,7 +29,10 @@ int Effect::latency() const
 
 void Effect::reset()
 {
-  const double window = std::max(double(config.millis), 1.0) * config.samplerate * 1e-3;
+  const double sr = config.samplerate * (config.decimate ? 0.5 : 1);
+  const double cp = config.concertpitch;
+
+  const double window = std::max(double(config.millis), 1.0) * sr * 1e-3;
   const double factor = std::pow(2.0, double(config.octave)) * 0.5;
   const size_t dftsize = static_cast<size_t>(std::max(window * factor, 1.0));
 
@@ -36,9 +43,6 @@ void Effect::reset()
 
   for (size_t i = 0; i < notes.size(); ++i)
   {
-    const double sr = config.samplerate;
-    const double cp = config.concertpitch;
-
     // https://newt.phys.unsw.edu.au/jw/notes.html
     const double hz = std::pow(2, (double(i) - 69) / 12) * cp;
 
@@ -49,11 +53,19 @@ void Effect::reset()
     };
   }
 
+  hbf->reset();
+  sdft->reset();
+
   dft.resize(sdft->size());
   std::fill(dft.begin(), dft.end(), 0);
 
   mask.clear();
   mask.reserve(notes.size());
+}
+
+void Effect::decimate(bool value)
+{
+  config.decimate = value;
 }
 
 void Effect::millis(int value)
@@ -99,43 +111,60 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
+  const auto process = [&](const float x, const uint64_t sample) -> float
+  {
+    sdft->sdft(x, dft.data());
+
+    for (size_t i = 1; i < dft.size() - 1; ++i)
+    {
+      const double abs = std::abs(dft[i]);
+      const double inc = double(i) * sample;
+
+      std::complex<double> arg = 0;
+      double sum = 0;
+
+      for (const size_t j : mask)
+      {
+        const auto& [omg, vel] = notes[j];
+
+        arg += std::polar(vel, omg * inc);
+        sum += vel;
+      }
+
+      dft[i] = (sum > 0) ? (abs / sum) * arg : 0;
+    }
+
+    dft[0] = dft[dft.size() - 1] = 0;
+
+    const float y = sdft->isdft(dft.data());
+
+    return y;
+  };
+
   std::transform(
     input.begin(),
     input.end(),
     output.begin(),
     [&](float x)
     {
-      if (hbf)
+      float y = buffer.value;
+
+      x = hbf->filter(x);
+
+      if (config.decimate)
       {
-        x = hbf->filter(x);
-      }
-
-      sdft->sdft(x, dft.data());
-
-      for (size_t i = 1; i < dft.size() - 1; ++i)
-      {
-        const double abs = std::abs(dft[i]);
-        const double inc = double(i) * config.sample;
-
-        std::complex<double> arg = 0;
-        double sum = 0;
-
-        for (const size_t j : mask)
+        if (buffer.sample % 2 == 0)
         {
-          const auto& [omg, vel] = notes[j];
-
-          arg += std::polar(vel, omg * inc);
-          sum += vel;
+          y = process(x, buffer.sample / 2);
         }
-
-        dft[i] = (sum > 0) ? (abs / sum) * arg : 0;
+      }
+      else
+      {
+        y = process(x, buffer.sample);
       }
 
-      dft[0] = dft[dft.size() - 1] = 0;
-
-      const float y = sdft->isdft(dft.data());
-
-      ++config.sample;
+      buffer.sample += 1;
+      buffer.value = y;
 
       return y;
     });

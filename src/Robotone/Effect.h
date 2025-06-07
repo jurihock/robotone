@@ -29,6 +29,7 @@ public:
 
   void reset();
 
+  void decimate(bool value);
   void millis(int value);
   void octave(int value);
 
@@ -41,11 +42,17 @@ private:
 
   struct config_t
   {
-    uint64_t sample;
     double samplerate;
     double concertpitch;
+    bool decimate;
     int millis;
     int octave;
+  };
+
+  struct buffer_t
+  {
+    uint64_t sample;
+    float value;
   };
 
   struct note_t
@@ -55,6 +62,7 @@ private:
   };
 
   config_t config;
+  buffer_t buffer;
 
   std::unique_ptr<HalfBandFilter<float, double>> hbf;
 

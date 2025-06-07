@@ -2,6 +2,20 @@
 
 Processor::Processor()
 {
+  parameters.notify("decimate", [&](auto value)
+  {
+    std::lock_guard lock(mutex);
+
+    for (size_t i = 0; i < effects.size(); ++i)
+    {
+      if (effects[i])
+      {
+        effects[i]->decimate(std::get<bool>(value));
+        effects[i]->reset();
+      }
+    }
+  });
+
   parameters.notify("millis", [&](auto value)
   {
     std::lock_guard lock(mutex);
@@ -35,6 +49,7 @@ std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const doub
 {
   auto effect = std::make_unique<Effect>(samplerate);
 
+  effect->decimate(parameters.get<bool>("decimate"));
   effect->millis(parameters.get<int>("millis"));
   effect->octave(parameters.get<int>("octave"));
   effect->reset();

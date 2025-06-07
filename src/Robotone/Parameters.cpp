@@ -7,6 +7,10 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     { "bypass", schema }, "Bypass", false,
     juce::AudioParameterBoolAttributes()));
 
+  add("decimate", new juce::AudioParameterBool(
+    { "decimate", schema }, "Downsample", false,
+    juce::AudioParameterBoolAttributes()));
+
   add("millis", new juce::AudioParameterInt(
     { "millis", schema }, "Window size", 1, 100, 10,
     juce::AudioParameterIntAttributes().withLabel("ms")));
