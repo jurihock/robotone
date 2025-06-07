@@ -27,7 +27,7 @@ b = sinc * win
 print(b)
 
 w, h = freqz(b, worN=1024, fs=44100)
-h = 20 * np.log10(abs(h))
+h = 20 * np.log10(np.abs(h))
 
 plot.figure(f'{taps} taps')
 plot.plot(w, h)
