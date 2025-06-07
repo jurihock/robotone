@@ -25,6 +25,14 @@ public:
       buffer(coeffs.size(), 0)
     {}
 
+    void reset()
+    {
+      std::fill(
+        buffer.begin(),
+        buffer.end(),
+        0);
+    }
+
     T filter(T x)
     {
       buffer.pop_back();
