@@ -160,7 +160,8 @@ namespace dsp
       }
       else
       {
-        sinc.at(i) = std::sin(n.at(i) * std::numbers::pi / 2) /
+        sinc.at(i) = std::sin(
+           n.at(i) * std::numbers::pi / 2) /
           (n.at(i) * std::numbers::pi + eps);
       }
     }
@@ -168,7 +169,8 @@ namespace dsp
     std::vector<T> coeffs(taps);
     for (size_t i = 0; i < taps; ++i)
     {
-      coeffs.at(i) = static_cast<T>(sinc.at(i) * win.at(i));
+      coeffs.at(i) = static_cast<T>(
+        sinc.at(i) * win.at(i));
     }
 
     return coeffs;
