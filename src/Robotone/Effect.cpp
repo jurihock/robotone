@@ -23,7 +23,7 @@ void Effect::reset()
   const double window = (config.milliseconds * 1e-3) / config.samplerate;
   const double factor = 0.5 / (config.decimation + 1);
 
-  const size_t dftsize = std::max(static_cast<size_t>(window * factor), size_t(1));
+  const size_t dftsize = static_cast<size_t>(std::max(window * factor, 1.0));
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
