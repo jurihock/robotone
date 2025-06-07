@@ -8,7 +8,7 @@ OPTIONS   = -DLOGGING=ON -DCHRONO=ON
 PLUGIN    = Robotone
 INPUT     = .
 OUTPUT    = ./build
-ARTEFACTS = $(OUTPUT)/$(PLUGIN)_artefacts/$(CONFIG)
+ARTEFACTS = $(OUTPUT)/src/$(PLUGIN)/$(PLUGIN)_artefacts/$(CONFIG)
 PLUGINVAL = $(OUTPUT)/_deps/pluginval-src/Contents/MacOS/pluginval
 
 help:

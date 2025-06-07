@@ -12,4 +12,5 @@ include("${CMAKE_CURRENT_LIST_DIR}/lib/juce.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/lib/juce_jingles.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/lib/sdft.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/lib/pluginval.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/Robotone/CMakeLists.txt")
+
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/src/Robotone")

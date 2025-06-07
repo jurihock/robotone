@@ -9,7 +9,7 @@ PLUGIN=Robotone
 INPUT=${ROOT}
 OUTPUT=${ROOT}/build
 
-ARTEFACTS=${OUTPUT}/${PLUGIN}_artefacts/${CONFIG}
+ARTEFACTS=${OUTPUT}/src/${PLUGIN}/${PLUGIN}_artefacts/${CONFIG}
 
 cmake ${ARGS} -DCMAKE_BUILD_TYPE=${CONFIG} -S "${INPUT}" -B "${OUTPUT}" || exit $?
 cmake --build "${OUTPUT}" || exit $?
