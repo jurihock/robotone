@@ -9,8 +9,6 @@ public:
 
   Parameters(juce::AudioProcessor& process);
 
-  void onbypass(std::function<void()> callback);
-
   bool bypass() const;
 
 private:
