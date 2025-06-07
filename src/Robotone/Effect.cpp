@@ -9,7 +9,6 @@ Effect::Effect(const double samplerate, const double concertpitch) :
     .decimation = 0
   })
 {
-  mask.reserve(notes.size());
   reset();
 }
 
@@ -44,6 +43,9 @@ void Effect::reset()
 
   dft.resize(sdft->size());
   std::fill(dft.begin(), dft.end(), 0);
+
+  mask.clear();
+  mask.reserve(notes.size());
 }
 
 void Effect::milliseconds(int value)
