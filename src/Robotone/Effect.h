@@ -2,8 +2,8 @@
 
 #include <JuceHeader.h>
 
-#include <Robotone/SDFT/msdft.h>
-// #include <Robotone/SDFT/osdft.h>
+// #include <Robotone/SDFT/msdft.h>
+#include <Robotone/SDFT/osdft.h>
 using namespace sdft;
 
 #include <algorithm>
@@ -27,8 +27,8 @@ public:
 
   void reset();
 
-  void milliseconds(int value);
-  void decimation(int value);
+  void millis(int value);
+  void octave(int value);
 
   void update(int note, double velocity);
 
@@ -42,8 +42,8 @@ private:
     uint64_t sample;
     double samplerate;
     double concertpitch;
-    int milliseconds;
-    int decimation;
+    int millis;
+    int octave;
   };
 
   struct note_t

@@ -5,8 +5,8 @@ Effect::Effect(const double samplerate, const double concertpitch) :
     .sample = 0,
     .samplerate = samplerate,
     .concertpitch = concertpitch,
-    .milliseconds = 10,
-    .decimation = 0
+    .millis = 10,
+    .octave = 0
   })
 {
   reset();
@@ -19,12 +19,12 @@ int Effect::latency() const
 
 void Effect::reset()
 {
-  const double window = 1e-3 * config.milliseconds * config.samplerate;
-  const double factor = 0.5 / (config.decimation + 1);
+  const double window = std::max(double(config.millis), 1.0) * config.samplerate * 1e-3;
+  const double factor = std::pow(2.0, double(config.octave)) * 0.5;
   const size_t dftsize = static_cast<size_t>(std::max(window * factor, 1.0));
 
-  LOG("Effect millis %d window %f factor %f dftsize %zu",
-    config.milliseconds, window, factor, dftsize);
+  LOG("Reset millis %d octave %d window %f factor %f dftsize %zu",
+    config.millis, config.octave, window, factor, dftsize);
 
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
@@ -50,14 +50,14 @@ void Effect::reset()
   mask.reserve(notes.size());
 }
 
-void Effect::milliseconds(int value)
+void Effect::millis(int value)
 {
-  config.milliseconds = value;
+  config.millis = value;
 }
 
-void Effect::decimation(int value)
+void Effect::octave(int value)
 {
-  config.decimation = value;
+  config.octave = value;
 }
 
 void Effect::update(int note, double velocity)

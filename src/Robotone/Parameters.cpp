@@ -7,11 +7,11 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     { "bypass", schema }, "Bypass", false,
     juce::AudioParameterBoolAttributes()));
 
-  add("milliseconds", new juce::AudioParameterInt(
-    { "milliseconds", schema }, "Window size", 5, 50, 10,
+  add("millis", new juce::AudioParameterInt(
+    { "millis", schema }, "Window size", 1, 100, 10,
     juce::AudioParameterIntAttributes().withLabel("ms")));
 
-  add("decimation", new juce::AudioParameterInt(
-    { "decimation", schema }, "Decimation ratio", 0, 4, 0,
+  add("octave", new juce::AudioParameterInt(
+    { "octave", schema }, "Octave shift", -3, +3, 0,
     juce::AudioParameterIntAttributes().withLabel("")));
 }
