@@ -34,6 +34,10 @@ app:
 log:
 	@tail -F ~/Library/Logs/$(PLUGIN)/$(PLUGIN).log
 
+relog:
+	@rm -f ~/Library/Logs/$(PLUGIN)/$(PLUGIN).log
+	@tail -F ~/Library/Logs/$(PLUGIN)/$(PLUGIN).log
+
 plug: unplug
 	@cp -rf $(ARTEFACTS)/AU/$(PLUGIN).component ~/Library/Audio/Plug-Ins/Components
 
