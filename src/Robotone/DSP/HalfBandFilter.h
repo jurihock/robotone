@@ -11,7 +11,7 @@
 namespace dsp
 {
   template<typename T>
-  std::vector<T> halfband(const size_t taps = 19, const T beta = 6);
+  std::vector<T> halfband(const size_t taps, const T beta);
 }
 
 template<typename T, typename F>
@@ -20,9 +20,13 @@ class HalfBandFilter final
 
 public:
 
-    HalfBandFilter() :
-      coeffs(dsp::halfband<F>()),
+    HalfBandFilter(std::vector<F> fir) :
+      coeffs(std::move(fir)),
       buffer(coeffs.size(), 0)
+    {}
+
+    HalfBandFilter(const size_t taps = 19, const T beta = 6) :
+      HalfBandFilter(dsp::halfband<F>(taps, beta))
     {}
 
     void reset()
