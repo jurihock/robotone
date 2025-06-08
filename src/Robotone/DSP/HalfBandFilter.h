@@ -80,13 +80,20 @@ namespace dsp
   template<typename T>
   T bessel(const T x)
   {
+    // replacement for std::cyl_bessel_i(0, x)
+    // https://en.cppreference.com/w/cpp/numeric/special_functions/cyl_bessel_i
+
+    // see also
+    // https://www.foo.be/docs-free/Numerical_Recipe_In_C/c6-6.pdf
+    // https://doi.org/10.1051/978-2-7598-3106-7.c010
+
     const double z = std::abs(x);
 
     double y = 0;
 
     if (z < 3.75)
     {
-      y = (x / 3.75);
+      y = x / 3.75;
 
       y *= y;
 
@@ -120,6 +127,9 @@ namespace dsp
   template<typename T>
   std::vector<T> kaiser(const size_t taps, const T beta)
   {
+    // see also
+    // https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.kaiser.html
+
     std::vector<T> window(taps);
 
     const double N = taps - 1.0;
@@ -140,6 +150,9 @@ namespace dsp
   template<typename T>
   std::vector<T> halfband(const size_t taps, const T beta)
   {
+    // see also
+    // https://www.dsprelated.com/showarticle/1113.php
+
     const double N = taps - 1.0;
 
     std::vector<double> n;
