@@ -3,11 +3,7 @@
 #include <JuceHeader.h>
 
 #include <Robotone/DSP/HalfBandFilter.h>
-
-// enable oSDFT by default #1
-// #include <Robotone/SDFT/msdft.h>
-#include <Robotone/SDFT/osdft.h>
-using namespace sdft;
+#include <Robotone/DSP/SDFT.h>
 
 #include <algorithm>
 #include <array>
