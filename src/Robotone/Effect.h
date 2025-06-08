@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include <Robotone/DSP/HalfBandFilter.h>
+#include <Robotone/DSP/Noise.h>
 #include <Robotone/DSP/SDFT.h>
 
 #include <algorithm>
@@ -61,6 +62,7 @@ private:
   config_t config;
   buffer_t buffer;
 
+  Noise<float> noise;
   std::unique_ptr<HalfBandFilter<float, double>> hbf;
 
   std::unique_ptr<SDFT<float, double>> sdft;

@@ -149,6 +149,7 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
     {
       float y = buffer.value;
 
+      // x = noise();
       x = hbf->filter(x);
 
       if (config.decimate)
