@@ -50,6 +50,8 @@ void Effect::reset()
 
   mask.clear();
   mask.reserve(notes.size());
+
+  sample = 0;
 }
 
 void Effect::decimate(bool value)
