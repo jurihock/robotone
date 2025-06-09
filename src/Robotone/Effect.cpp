@@ -102,14 +102,14 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
-  const auto process = [this](const float x, const uint64_t sample) -> float
+  const auto process = [this](const float x, const double sample) -> float
   {
     sdft->sdft(x, dft.data());
 
     for (size_t i = 1; i < dft.size() - 1; ++i)
     {
       const double abs = std::abs(dft[i]);
-      const double inc = double(i) * sample;
+      const double inc = i * sample;
 
       std::complex<double> arg = 0;
       double sum = 0;
