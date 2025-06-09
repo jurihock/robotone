@@ -2,8 +2,8 @@
 
 #include <JuceHeader.h>
 
-#include <Robotone/DSP/HalfBandFilter.h>
 #include <Robotone/DSP/Noise.h>
+#include <Robotone/DSP/SampleRateConverter.h>
 #include <Robotone/DSP/SDFT.h>
 
 #include <algorithm>
@@ -20,7 +20,7 @@ class Effect final : public juce::jingles::AudioEffect
 
 public:
 
-  Effect(const double samplerate, const double concertpitch = 440);
+  Effect(const double samplerate, const size_t blocksize, const double concertpitch = 440);
   virtual ~Effect() = default;
 
   int latency() const override;
@@ -41,16 +41,11 @@ private:
   struct config_t
   {
     double samplerate;
+    size_t blocksize;
     double concertpitch;
     bool decimate;
     int millis;
     int octave;
-  };
-
-  struct buffer_t
-  {
-    uint64_t sample;
-    float value;
   };
 
   struct note_t
@@ -60,10 +55,10 @@ private:
   };
 
   config_t config;
-  buffer_t buffer;
+  uint64_t sample;
 
   Noise<float> noise;
-  std::unique_ptr<HalfBandFilter<float, double>> hbf;
+  std::unique_ptr<SampleRateConverter> src;
 
   std::unique_ptr<SDFT<float, double>> sdft;
   std::vector<std::complex<double>> dft;

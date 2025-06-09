@@ -1,24 +1,15 @@
 #include <Robotone/Effect.h>
 
-Effect::Effect(const double samplerate, const double concertpitch) :
+Effect::Effect(const double samplerate, const size_t blocksize, const double concertpitch) :
   config({
     .samplerate = samplerate,
+    .blocksize = blocksize,
     .concertpitch = concertpitch,
     .decimate = false,
     .millis = 10,
     .octave = 0,
-  }),
-  buffer({
-    .sample = 0,
-    .value = 0,
   })
 {
-  hbf = std::make_unique<HalfBandFilter<float, double>>();
-  {
-    const auto str = hbf->str();
-    LOG("HBF %s", str.c_str());
-  }
-
   reset();
 }
 
@@ -39,6 +30,7 @@ void Effect::reset()
   LOG("Reset millis %d octave %d window %f factor %f dftsize %zu",
     config.millis, config.octave, window, factor, dftsize);
 
+  src = std::make_unique<SampleRateConverter>(config.samplerate, sr, config.blocksize);
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
   for (size_t i = 0; i < notes.size(); ++i)
@@ -52,9 +44,6 @@ void Effect::reset()
       .velocity = 0,
     };
   }
-
-  hbf->reset();
-  sdft->reset();
 
   dft.resize(sdft->size());
   std::fill(dft.begin(), dft.end(), 0);
@@ -111,7 +100,7 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
-  const auto process = [&](const float x, const uint64_t sample) -> float
+  const auto process = [this](const float x, const uint64_t sample) -> float
   {
     sdft->sdft(x, dft.data());
 
@@ -141,32 +130,21 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
     return y;
   };
 
-  std::transform(
-    input.begin(),
-    input.end(),
-    output.begin(),
-    [&](float x)
-    {
-      float y = buffer.value;
-
-      // x = noise();
-      x = hbf->filter(x);
-
-      if (config.decimate)
+  src->resample(input, output,
+    [process, this](const std::span<const float> input,
+                    const std::span<float> output)
+  {
+    std::transform(
+      input.begin(),
+      input.end(),
+      output.begin(),
+      [&](float x)
       {
-        if (buffer.sample % 2 == 0)
-        {
-          y = process(x, buffer.sample / 2);
-        }
-      }
-      else
-      {
-        y = process(x, buffer.sample);
-      }
+        // x = noise();
 
-      buffer.sample += 1;
-      buffer.value = y;
+        float y = process(x, sample++);
 
-      return y;
-    });
+        return y;
+      });
+  });
 }

@@ -14,6 +14,7 @@ namespace dsp
   std::vector<T> halfband(const size_t taps, const T beta);
 }
 
+[[deprecated("Use SampleRateConverter instead!")]]
 template<typename T, typename F>
 class HalfBandFilter final
 {

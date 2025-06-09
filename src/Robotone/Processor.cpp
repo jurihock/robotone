@@ -47,7 +47,7 @@ Processor::Processor()
 
 std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const double samplerate, const size_t blocksize)
 {
-  auto effect = std::make_unique<Effect>(samplerate);
+  auto effect = std::make_unique<Effect>(samplerate, blocksize);
 
   effect->decimate(parameters.get<bool>("decimate"));
   effect->millis(parameters.get<int>("millis"));

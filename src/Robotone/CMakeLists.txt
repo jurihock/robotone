@@ -50,6 +50,7 @@ target_sources(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
     juce_jingles
+    samplerate
     sdft)
 
 target_link_libraries(${PROJECT_NAME}
