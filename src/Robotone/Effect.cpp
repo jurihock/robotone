@@ -30,7 +30,7 @@ void Effect::reset()
   LOG("Reset millis %d octave %d window %f factor %f dftsize %zu",
     config.millis, config.octave, window, factor, dftsize);
 
-  src = std::make_unique<SampleRateConverter>(config.samplerate, sr, config.blocksize);
+  src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
   sdft = std::make_unique<SDFT<float, double>>(dftsize);
 
   for (size_t i = 0; i < notes.size(); ++i)

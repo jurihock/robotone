@@ -3,8 +3,8 @@
 #include <JuceHeader.h>
 
 #include <Robotone/DSP/Noise.h>
-#include <Robotone/DSP/SampleRateConverter.h>
 #include <Robotone/DSP/SDFT.h>
+#include <Robotone/DSP/SRC.h>
 
 #include <algorithm>
 #include <array>
@@ -58,7 +58,7 @@ private:
   uint64_t sample;
 
   Noise<float> noise;
-  std::unique_ptr<SampleRateConverter> src;
+  std::unique_ptr<SRC> src;
 
   std::unique_ptr<SDFT<float, double>> sdft;
   std::vector<std::complex<double>> dft;

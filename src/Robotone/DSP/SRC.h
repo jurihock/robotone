@@ -9,12 +9,12 @@
 #include <utility>
 #include <vector>
 
-class SampleRateConverter final
+class SRC final
 {
 
 public:
 
-  SampleRateConverter(const double samplerate_from, const double samplerate_to, const size_t blocksize) :
+  SRC(const double samplerate_from, const double samplerate_to, const size_t blocksize) :
     samplerates({samplerate_from, samplerate_to})
   {
     const auto setup = [](src_t& src, double ratio, size_t size, int quality = SRC_SINC_FASTEST)
@@ -97,9 +97,6 @@ public:
     src.data.input_frames = static_cast<long>(input.size());
     src.data.output_frames = static_cast<long>(src.buffer.size());
 
-    src.data.input_frames_used = 0;
-    src.data.output_frames_gen = 0;
-
     error = src_process(src.state.get(), &src.data);
 
     if (error)
@@ -117,9 +114,6 @@ public:
 
     dst.data.input_frames = static_cast<long>(n);
     dst.data.output_frames = static_cast<long>(output.size());
-
-    dst.data.input_frames_used = 0;
-    dst.data.output_frames_gen = 0;
 
     error = src_process(dst.state.get(), &dst.data);
 
