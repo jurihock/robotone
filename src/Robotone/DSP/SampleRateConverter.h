@@ -131,7 +131,7 @@ public:
 
     auto m = static_cast<size_t>(std::max(dst.data.output_frames_gen, 0L));
 
-    std::fill(output.begin() + m, output.end(), 0);
+    std::fill(output.begin() + m, output.end(), float(0));
   }
 
 private:
