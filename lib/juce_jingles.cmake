@@ -8,5 +8,7 @@ CPMAddPackage(
   DOWNLOAD_ONLY YES)
 
 if(juce_jingles_ADDED)
+
   juce_add_module("${juce_jingles_SOURCE_DIR}/juce_jingles")
+
 endif()

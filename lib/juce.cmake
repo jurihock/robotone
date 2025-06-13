@@ -2,8 +2,8 @@
 
 CPMAddPackage(
   NAME JUCE
-  VERSION 8.0.7
-  GIT_TAG 8.0.7
+  VERSION 8.0.8
+  GIT_TAG 8.0.8
   GITHUB_REPOSITORY juce-framework/JUCE
   DOWNLOAD_ONLY YES)
 
