@@ -108,9 +108,9 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
 
     const double sum = std::accumulate(
       mask.begin(), mask.end(), double(0),
-      [&](double res, size_t idx)
+      [&](double res, size_t note)
       {
-        return res + notes[idx].velocity;
+        return res + notes[note].velocity;
       });
 
     for (size_t i = 1; i < dft.size() - 1; ++i)
@@ -120,9 +120,9 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
 
       const std::complex<double> val = std::accumulate(
         mask.begin(), mask.end(), std::complex<double>(0),
-        [&](std::complex<double> res, size_t idx)
+        [&](std::complex<double> res, size_t note)
         {
-          const auto& [omg, vel] = notes[idx];
+          const auto& [omg, vel] = notes[note];
           return res + std::polar(vel, omg * inc);
         });
 
