@@ -106,21 +106,25 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
   {
     sdft->sdft(x, dft.data());
 
+    const double sum = std::accumulate(
+      mask.begin(), mask.end(), double(0),
+      [&](double res, size_t idx)
+      {
+        return res + notes[idx].velocity;
+      });
+
     for (size_t i = 1; i < dft.size() - 1; ++i)
     {
       const double abs = std::abs(dft[i]);
-      const double inc = static_cast<double>(i * sample);
+      const double inc = static_cast<double>(sample * i);
 
-      std::complex<double> val = 0;
-      double sum = 0;
-
-      for (const size_t j : mask)
-      {
-        const auto& [omg, vel] = notes[j];
-
-        val += std::polar(vel, omg * inc);
-        sum += vel;
-      }
+      const std::complex<double> val = std::accumulate(
+        mask.begin(), mask.end(), std::complex<double>(0),
+        [&](std::complex<double> res, size_t idx)
+        {
+          const auto& [omg, vel] = notes[idx];
+          return res + std::polar(vel, omg * inc);
+        });
 
       dft[i] = (sum > 0) ? (abs / sum) * val : 0;
     }

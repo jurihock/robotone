@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <memory>
 #include <numbers>
+#include <numeric>
 #include <span>
 #include <vector>
 
