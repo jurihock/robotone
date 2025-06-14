@@ -111,18 +111,18 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
       const double abs = std::abs(dft[i]);
       const double inc = static_cast<double>(i * sample);
 
-      std::complex<double> arg = 0;
+      std::complex<double> val = 0;
       double sum = 0;
 
       for (const size_t j : mask)
       {
         const auto& [omg, vel] = notes[j];
 
-        arg += std::polar(vel, omg * inc);
+        val += std::polar(vel, omg * inc);
         sum += vel;
       }
 
-      dft[i] = (sum > 0) ? (abs / sum) * arg : 0;
+      dft[i] = (sum > 0) ? (abs / sum) * val : 0;
     }
 
     dft[0] = dft[dft.size() - 1] = 0;
