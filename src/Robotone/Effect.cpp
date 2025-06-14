@@ -31,7 +31,7 @@ void Effect::reset()
     config.millis, config.octave, window, factor, dftsize);
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
-  sdft = std::make_unique<SDFT<float, double>>(dftsize);
+  sdft = std::make_unique<SDFT<float, double>>(sr, dftsize);
 
   for (size_t i = 0; i < notes.size(); ++i)
   {
