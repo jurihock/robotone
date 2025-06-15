@@ -4,12 +4,14 @@
 
 #include <Robotone/DSP/Noise.h>
 #include <Robotone/DSP/SDFT.h>
+#include <Robotone/DSP/PVC.h>
 #include <Robotone/DSP/SRC.h>
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <numbers>
 #include <numeric>
@@ -51,6 +53,7 @@ private:
 
   struct note_t
   {
+    double hz;
     double omega;
     double velocity;
   };
@@ -59,6 +62,7 @@ private:
   uint64_t sample;
 
   Noise<float> noise;
+  std::unique_ptr<PVC> pvc;
   std::unique_ptr<SRC> src;
 
   std::unique_ptr<SDFT<float, double>> sdft;

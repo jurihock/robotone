@@ -32,6 +32,7 @@ void Effect::reset()
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
   sdft = std::make_unique<SDFT<float, double>>(sr, dftsize);
+  pvc = std::make_unique<PVC>(sdft->samplerate(), sdft->frequencies());
 
   for (size_t i = 0; i < notes.size(); ++i)
   {
@@ -40,6 +41,7 @@ void Effect::reset()
 
     notes[i] =
     {
+      .hz = hz,
       .omega = 2 * std::numbers::pi * hz / sr,
       .velocity = 0,
     };
@@ -102,7 +104,7 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
-  const auto process = [this](const float x, const uint64_t sample) -> float
+  const auto process1 = [this](const float x, const uint64_t sample) -> float
   {
     sdft->sdft(x, dft.data());
 
@@ -122,7 +124,7 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
         mask.begin(), mask.end(), std::complex<double>(0),
         [&](std::complex<double> res, size_t note)
         {
-          const auto& [omg, vel] = notes[note];
+          const auto& [hz, omg, vel] = notes[note];
           return res + std::polar(vel, omg * inc);
         });
 
@@ -135,6 +137,34 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
 
     return y;
   };
+
+  const auto process2 = [this](const float x, const uint64_t sample) -> float
+  {
+    sdft->sdft(x, dft.data());
+
+    pvc->process(dft, [&](const std::span<double> freqs)
+    {
+      const auto bins = sdft->frequencies();
+      const double freq = (mask.size() > 0) ? notes[mask.front()].hz : 0;
+
+      for (size_t i = 0; i < freqs.size(); ++i)
+      {
+        const double f0 = freqs[i];
+        const double f1 = freq * i;
+
+        freqs[i] = f1 * f0 / bins[i]; // f1 + (f0 - bins[i]) * (f1 / bins[i])
+      }
+    });
+
+    const float y = sdft->isdft(dft.data());
+
+    return y;
+  };
+
+  juce::ignoreUnused(process1);
+  juce::ignoreUnused(process2);
+
+  const auto process = process1;
 
   src->resample(input, output,
     [process, this](const std::span<const float> input,
@@ -149,6 +179,8 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
         // x = noise();
 
         float y = process(x, sample++);
+
+        y = std::clamp<float>(y, -1, +1);
 
         return y;
       });
