@@ -31,7 +31,6 @@ void Effect::reset()
     config.millis, config.octave, window, factor, dftsize);
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
-  sdft = std::make_unique<SDFT<float, double>>(sr, dftsize);
   sdft = std::make_unique<SDFT>(sr, dftsize);
 
   vocoder = std::make_unique<Vocoder>(sdft->samplerate(), sdft->frequencies());

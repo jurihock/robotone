@@ -15,17 +15,14 @@ public:
     // https://newt.phys.unsw.edu.au/jw/notes.html
     const double hz = std::pow(2, (double(index) - 69) / 12) * concertpitch;
 
-    // TODO
-    // const double omega = 2 * std::numbers::pi * hz / samplerate;
-
     config.freq = hz;
     config.gain = 0;
 
     config.samplerate = samplerate;
     config.concertpitch = concertpitch;
 
-    config.pvcfreqs.resize(dftsize);
-    config.pvcphase.resize(dftsize);
+    config.freqs.resize(dftsize);
+    config.phase.resize(dftsize);
   }
 
   Channel(const Channel& other) :
@@ -54,43 +51,42 @@ public:
   }
 
   double synthesize(const std::span<std::complex<double>> dft,
-                    const std::span<const double> bins,
-                    const std::span<const double> freqs)
+                    const std::span<const double> dftfreqs,
+                    const std::span<const double> pvcfreqs)
   {
     const double tophase = (2 * std::numbers::pi) / config.samplerate;
 
-    const double gain = config.gain;
     const double freq = config.freq;
+    const double gain = config.gain;
 
-    const auto& dftfreqs = bins;
-    auto& pvcfreqs = config.pvcfreqs;
-    auto& pvcphase = config.pvcphase;
+    auto& freqs = config.freqs;
+    auto& phase = config.phase;
 
-    for (size_t i = 0; i < pvcfreqs.size(); ++i)
+    for (size_t i = 0; i < freqs.size(); ++i)
     {
-      const double f0 = freqs[i];
+      const double f0 = pvcfreqs[i];
       const double f1 = freq * i;
 
-      pvcfreqs[i] = f1 * f0 / dftfreqs[i]; // f1 + (f0 - dftfreqs[i]) * (f1 / dftfreqs[i])
+      freqs[i] = f1 * f0 / dftfreqs[i]; // TODO: f1 + (f0 - dftfreqs[i]) * (f1 / dftfreqs[i])
     }
 
     for (size_t i = 1; i < dft.size() - 1; ++i)
     {
-      pvcphase[i] += pvcfreqs[i] * tophase; // omega[i] + (pvcfreqs[i] - dftfreqs[i]) * scale
+      phase[i] += freqs[i] * tophase; // TODO: omega[i] + (freqs[i] - dftfreqs[i]) * tophase
 
-      if (pvcfreqs[i] <= dftfreqs.front())
+      if (freqs[i] <= dftfreqs.front())
       {
         // dft[i] = 0;
         continue;
       }
 
-      if (pvcfreqs[i] >= dftfreqs.back())
+      if (freqs[i] >= dftfreqs.back())
       {
         // dft[i] = 0;
         continue;
       }
 
-      dft[i] += std::polar(gain, pvcphase[i]);
+      dft[i] += std::polar(gain, phase[i]);
     }
 
     return gain;
@@ -106,8 +102,8 @@ private:
     double samplerate;
     double concertpitch;
 
-    std::vector<double> pvcfreqs;
-    std::vector<double> pvcphase;
+    std::vector<double> freqs;
+    std::vector<double> phase;
   }
   config;
 
