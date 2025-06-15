@@ -1,5 +1,5 @@
 project(Robotone
-  DESCRIPTION "Make the human voice sound robotic"
+  DESCRIPTION "MIDI-controlled polyphonic vocal harmonizer"
   VERSION 1.0)
 
 set(FORMATS Standalone VST3)
