@@ -2,21 +2,11 @@
 
 #include <JuceHeader.h>
 
+#include <Robotone/DSP/Channels.h>
 #include <Robotone/DSP/Noise.h>
 #include <Robotone/DSP/SDFT.h>
-#include <Robotone/DSP/PVC.h>
 #include <Robotone/DSP/SRC.h>
-
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <numbers>
-#include <numeric>
-#include <span>
-#include <vector>
+#include <Robotone/DSP/Vocoder.h>
 
 class Effect final : public juce::jingles::AudioEffect
 {
@@ -51,25 +41,15 @@ private:
     int octave;
   };
 
-  struct note_t
-  {
-    double hz;
-    double omega;
-    double velocity;
-  };
-
   config_t config;
   uint64_t sample;
 
-  Noise<float> noise;
-  std::unique_ptr<PVC> pvc;
   std::unique_ptr<SRC> src;
+  std::unique_ptr<SDFT> sdft;
+  std::unique_ptr<Vocoder> vocoder;
+  std::unique_ptr<Channels> channels;
 
-  std::unique_ptr<SDFT<float, double>> sdft;
-  std::vector<std::complex<double>> dft;
-
-  std::array<note_t, 128> notes;
-  std::vector<size_t> mask;
+  Noise<float> noise;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Effect)
 

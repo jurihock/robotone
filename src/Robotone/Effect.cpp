@@ -32,26 +32,10 @@ void Effect::reset()
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
   sdft = std::make_unique<SDFT<float, double>>(sr, dftsize);
-  pvc = std::make_unique<PVC>(sdft->samplerate(), sdft->frequencies());
+  sdft = std::make_unique<SDFT>(sr, dftsize);
 
-  for (size_t i = 0; i < notes.size(); ++i)
-  {
-    // https://newt.phys.unsw.edu.au/jw/notes.html
-    const double hz = std::pow(2, (double(i) - 69) / 12) * cp;
-
-    notes[i] =
-    {
-      .hz = hz,
-      .omega = 2 * std::numbers::pi * hz / sr,
-      .velocity = 0,
-    };
-  }
-
-  dft.resize(sdft->size());
-  std::fill(dft.begin(), dft.end(), 0);
-
-  mask.clear();
-  mask.reserve(notes.size());
+  vocoder = std::make_unique<Vocoder>(sdft->samplerate(), sdft->frequencies());
+  channels = std::make_unique<Channels>(sdft->samplerate(), sdft->frequencies(), cp);
 
   sample = 0;
 }
@@ -73,21 +57,7 @@ void Effect::octave(int value)
 
 void Effect::update(int note, double velocity)
 {
-  if (note < 0 || static_cast<int>(notes.size()) <= note)
-  {
-    return;
-  }
-
-  if (velocity <= 0)
-  {
-    mask.erase(std::remove(mask.begin(), mask.end(), note), mask.end());
-  }
-  else if (notes[note].velocity <= 0)
-  {
-    mask.push_back(note);
-  }
-
-  notes[note].velocity = velocity;
+  channels->update(note, velocity);
 }
 
 void Effect::dry(const std::span<const float> input, const std::span<float> output)
@@ -104,67 +74,79 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
-  const auto process1 = [this](const float x, const uint64_t sample) -> float
-  {
-    sdft->sdft(x, dft.data());
+  // const auto process1 = [this](const float x, const uint64_t sample) -> float
+  // {
+  //   sdft->sdft(x, dft.data());
 
-    const double sum = std::accumulate(
-      mask.begin(), mask.end(), double(0),
-      [&](double res, size_t note)
+  //   const double sum = std::accumulate(
+  //     mask.begin(), mask.end(), double(0),
+  //     [&](double res, size_t note)
+  //     {
+  //       return res + notes[note].velocity;
+  //     });
+
+  //   for (size_t i = 1; i < dft.size() - 1; ++i)
+  //   {
+  //     const double abs = std::abs(dft[i]);
+  //     const double inc = static_cast<double>(sample * i);
+
+  //     const std::complex<double> val = std::accumulate(
+  //       mask.begin(), mask.end(), std::complex<double>(0),
+  //       [&](std::complex<double> res, size_t note)
+  //       {
+  //         const auto& [hz, omg, vel] = notes[note];
+  //         return res + std::polar(vel, omg * inc);
+  //       });
+
+  //     dft[i] = (sum > 0) ? (abs / sum) * val : 0;
+  //   }
+
+  //   dft[0] = dft[dft.size() - 1] = 0;
+
+  //   const float y = sdft->isdft(dft.data());
+
+  //   return y;
+  // };
+
+  // const auto process2 = [this](const float x, const uint64_t sample) -> float
+  // {
+  //   sdft->sdft(x, dft.data());
+
+  //   pvc->process(dft, [&](const std::span<double> freqs)
+  //   {
+  //     const auto bins = sdft->frequencies();
+  //     const double freq = (mask.size() > 0) ? notes[mask.front()].hz : 0;
+
+  //     for (size_t i = 0; i < freqs.size(); ++i)
+  //     {
+  //       const double f0 = freqs[i];
+  //       const double f1 = freq * i;
+
+  //       freqs[i] = f1 * f0 / bins[i]; // f1 + (f0 - bins[i]) * (f1 / bins[i])
+  //     }
+  //   });
+
+  //   const float y = sdft->isdft(dft.data());
+
+  //   return y;
+  // };
+
+  // juce::ignoreUnused(process1);
+  // juce::ignoreUnused(process2);
+
+  // const auto process = process2;
+
+  const auto process = [this](const float x, const uint64_t sample) -> float
+  {
+    return sdft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
+                                  const std::span<std::complex<double>> dftsynth)
+    {
+      vocoder->analyze(dftanal, [&](const std::span<const double> pvcfreqs)
       {
-        return res + notes[note].velocity;
+        channels->synthesize(dftanal, dftsynth, pvcfreqs);
       });
-
-    for (size_t i = 1; i < dft.size() - 1; ++i)
-    {
-      const double abs = std::abs(dft[i]);
-      const double inc = static_cast<double>(sample * i);
-
-      const std::complex<double> val = std::accumulate(
-        mask.begin(), mask.end(), std::complex<double>(0),
-        [&](std::complex<double> res, size_t note)
-        {
-          const auto& [hz, omg, vel] = notes[note];
-          return res + std::polar(vel, omg * inc);
-        });
-
-      dft[i] = (sum > 0) ? (abs / sum) * val : 0;
-    }
-
-    dft[0] = dft[dft.size() - 1] = 0;
-
-    const float y = sdft->isdft(dft.data());
-
-    return y;
-  };
-
-  const auto process2 = [this](const float x, const uint64_t sample) -> float
-  {
-    sdft->sdft(x, dft.data());
-
-    pvc->process(dft, [&](const std::span<double> freqs)
-    {
-      const auto bins = sdft->frequencies();
-      const double freq = (mask.size() > 0) ? notes[mask.front()].hz : 0;
-
-      for (size_t i = 0; i < freqs.size(); ++i)
-      {
-        const double f0 = freqs[i];
-        const double f1 = freq * i;
-
-        freqs[i] = f1 * f0 / bins[i]; // f1 + (f0 - bins[i]) * (f1 / bins[i])
-      }
     });
-
-    const float y = sdft->isdft(dft.data());
-
-    return y;
   };
-
-  juce::ignoreUnused(process1);
-  juce::ignoreUnused(process2);
-
-  const auto process = process1;
 
   src->resample(input, output,
     [process, this](const std::span<const float> input,
@@ -179,8 +161,6 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
         // x = noise();
 
         float y = process(x, sample++);
-
-        y = std::clamp<float>(y, -1, +1);
 
         return y;
       });

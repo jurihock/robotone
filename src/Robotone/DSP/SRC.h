@@ -1,13 +1,8 @@
 #pragma once
 
-#include <samplerate.h>
+#include <Robotone/DSP/Header.h>
 
-#include <algorithm>
-#include <functional>
-#include <memory>
-#include <span>
-#include <utility>
-#include <vector>
+#include <samplerate.h>
 
 class SRC final
 {
