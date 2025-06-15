@@ -77,13 +77,11 @@ public:
 
       if (freqs[i] <= dftfreqs.front())
       {
-        // dft[i] = 0;
         continue;
       }
 
       if (freqs[i] >= dftfreqs.back())
       {
-        // dft[i] = 0;
         continue;
       }
 
