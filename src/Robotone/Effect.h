@@ -42,7 +42,6 @@ private:
   };
 
   config_t config;
-  uint64_t sample;
 
   std::unique_ptr<SRC> src;
   std::unique_ptr<SDFT> sdft;
