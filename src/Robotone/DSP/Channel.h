@@ -62,7 +62,7 @@ public:
     auto& freqs = config.freqs;
     auto& phase = config.phase;
 
-    for (size_t i = 0; i < freqs.size(); ++i)
+    for (size_t i = 1; i < dft.size() - 1; ++i)
     {
       const double f0 = pvcfreqs[i];
       const double f1 = freq * i;
