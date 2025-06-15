@@ -52,7 +52,8 @@ public:
 
   double synthesize(const std::span<std::complex<double>> dft,
                     const std::span<const double> dftfreqs,
-                    const std::span<const double> pvcfreqs)
+                    const std::span<const double> pvcfreqs,
+                    const double gestalt) // TODO: gestalt
   {
     const double tophase = (2 * std::numbers::pi) / config.samplerate;
 

@@ -8,6 +8,7 @@ Effect::Effect(const double samplerate, const size_t blocksize, const double con
     .decimate = false,
     .millis = 10,
     .octave = 0,
+    .gestalt = 0,
   })
 {
   reset();
@@ -52,6 +53,11 @@ void Effect::octave(int value)
   config.octave = value;
 }
 
+void Effect::gestalt(double value)
+{
+  config.gestalt = value;
+}
+
 void Effect::update(int note, double velocity)
 {
   channels->update(note, velocity);
@@ -71,6 +77,8 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
+  const double gestalt = config.gestalt;
+
   src->resample(input, output, [&](const std::span<const float> input,
                                    const std::span<float> output)
   {
@@ -87,7 +95,7 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
         {
           vocoder->analyze(dftanal, [&](const std::span<const double> pvcfreqs)
           {
-            channels->synthesize(dftanal, dftsynth, pvcfreqs);
+            channels->synthesize(dftanal, dftsynth, pvcfreqs, gestalt);
           });
         });
 

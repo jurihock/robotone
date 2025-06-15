@@ -43,6 +43,19 @@ Processor::Processor()
       }
     }
   });
+
+  parameters.notify("gestalt", [&](auto value)
+  {
+    std::lock_guard lock(mutex);
+
+    for (size_t i = 0; i < effects.size(); ++i)
+    {
+      if (effects[i])
+      {
+        effects[i]->gestalt(std::get<double>(value));
+      }
+    }
+  });
 }
 
 std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const double samplerate, const size_t blocksize)

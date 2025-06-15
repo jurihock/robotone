@@ -21,7 +21,8 @@ public:
 
   void synthesize(const std::span<const std::complex<double>> dftanal,
                   const std::span<std::complex<double>> dftsynth,
-                  const std::span<const double> pvcfreqs)
+                  const std::span<const double> pvcfreqs,
+                  const double gestalt)
   {
     const std::span<const double> dftfreqs(frequencies.data(), frequencies.size());
 
@@ -29,7 +30,7 @@ public:
 
     for (size_t channel : mask)
     {
-      sum += channels[channel].synthesize(dftsynth, dftfreqs, pvcfreqs);
+      sum += channels[channel].synthesize(dftsynth, dftfreqs, pvcfreqs, gestalt);
     }
 
     for (size_t i = 1; i < dftsynth.size() - 1; ++i)
