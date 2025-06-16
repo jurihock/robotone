@@ -5,6 +5,7 @@ SDFT::SDFT(const double samplerate, const size_t dftsize) :
   input(dftsize),
   output(dftsize)
 {
+  assert_true(dftsize > 0, "Invalid DFT size!");
 }
 
 float SDFT::transform(const float x, const std::function<void(

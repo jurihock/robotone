@@ -9,6 +9,8 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
   // https://newt.phys.unsw.edu.au/jw/notes.html
   const double hz = std::pow(2, (double(index) - 69) / 12) * concertpitch;
 
+  config.dftsize = dftsize;
+
   config.freq = hz;
   config.gain = 0;
 
@@ -49,6 +51,8 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
                            const std::span<const double> pvcfreqs,
                            const double gestalt) // TODO: gestalt
 {
+  assert_true(dft.size() == config.dftsize, "Invalid DFT size!");
+
   const double tophase = (2 * std::numbers::pi) / config.samplerate;
 
   const double freq = config.freq;
@@ -62,12 +66,12 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
     const double f0 = pvcfreqs[i];
     const double f1 = freq * i;
 
-    freqs[i] = f1 * f0 / dftfreqs[i]; // TODO: f1 + (f0 - dftfreqs[i]) * (f1 / dftfreqs[i])
+    freqs[i] = f1 * f0 / dftfreqs[i];
   }
 
   for (size_t i = 1; i < dft.size() - 1; ++i)
   {
-    phase[i] += freqs[i] * tophase; // TODO: omega[i] + (freqs[i] - dftfreqs[i]) * tophase
+    phase[i] += freqs[i] * tophase;
 
     if (freqs[i] <= dftfreqs.front())
     {

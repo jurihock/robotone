@@ -25,7 +25,7 @@ void Channels::synthesize(const std::span<const std::complex<double>> dftanal,
     sum += channels[channel].synthesize(dftsynth, dftfreqs, pvcfreqs, gestalt);
   }
 
-  for (size_t i = 1; i < dftsynth.size() - 1; ++i)
+  for (size_t i = 1; i < dftfreqs.size() - 1; ++i)
   {
     const double abs = std::abs(dftanal[i]);
 

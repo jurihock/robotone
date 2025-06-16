@@ -15,3 +15,5 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+
+#include <Robocode/Assert.h>

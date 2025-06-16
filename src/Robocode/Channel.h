@@ -25,6 +25,8 @@ private:
 
   struct
   {
+    size_t dftsize;
+
     double freq;
     double gain;
 
