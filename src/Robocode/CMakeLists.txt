@@ -22,6 +22,11 @@ target_link_libraries(${PROJECT_NAME}
     samplerate
     sdft)
 
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags)
+
 target_compile_features(${PROJECT_NAME}
   PUBLIC
     cxx_std_20)
