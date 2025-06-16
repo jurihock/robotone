@@ -34,7 +34,8 @@ private:
     double concertpitch;
 
     std::vector<double> chnfreqs;
-    std::vector<double> chnphase;
+    std::vector<double> robotphase;
+    std::vector<double> humanphase;
   }
   config;
 

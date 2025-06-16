@@ -18,7 +18,8 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
   config.concertpitch = concertpitch;
 
   config.chnfreqs.resize(dftsize);
-  config.chnphase.resize(dftsize);
+  config.robotphase.resize(dftsize);
+  config.humanphase.resize(dftsize);
 
   for (size_t i = 0; i < dftsize; ++i)
   {
@@ -54,36 +55,54 @@ void Channel::gain(const double gain)
 double Channel::synthesize(const std::span<std::complex<double>> dft,
                            const std::span<const double> dftfreqs,
                            const std::span<const double> pvcfreqs,
-                           const double gestalt) // TODO: gestalt
+                           const double gestalt)
 {
   assert_true(dft.size() == config.dftsize, "Invalid DFT size!");
 
   const double freq2phase = (2 * std::numbers::pi) / config.samplerate;
 
-  const double gain = config.gain;
+  const double human = (gestalt + 1) / 2;
+  const double robot = 1 - human;
 
+  const double gain = config.gain;
   const auto& chnfreqs = config.chnfreqs;
-  auto& chnphase = config.chnphase;
+
+  auto& robotphase = config.robotphase;
+  auto& humanphase = config.humanphase;
 
   for (size_t i = 1; i < dft.size() - 1; ++i)
   {
     const double chnfreq = chnfreqs[i];
     const double pvcfreq = pvcfreqs[i];
-    const double newfreq = chnfreq * pvcfreq;
 
-    chnphase[i] += newfreq * freq2phase;
+    const double robotfreq = chnfreq;
+    const double humanfreq = chnfreq * pvcfreq;
 
-    if (newfreq <= dftfreqs.front())
+    robotphase[i] += robotfreq * freq2phase;
+    humanphase[i] += humanfreq * freq2phase;
+
+    if (robotfreq <= dftfreqs.front())
     {
       continue;
     }
 
-    if (newfreq >= dftfreqs.back())
+    if (robotfreq >= dftfreqs.back())
     {
       continue;
     }
 
-    dft[i] += std::polar(gain, chnphase[i]);
+    if (humanfreq <= dftfreqs.front())
+    {
+      continue;
+    }
+
+    if (humanfreq >= dftfreqs.back())
+    {
+      continue;
+    }
+
+    dft[i] += robot * std::polar(gain, robotphase[i]);
+    dft[i] += human * std::polar(gain, humanphase[i]);
   }
 
   return gain;
