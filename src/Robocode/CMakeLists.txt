@@ -1,6 +1,7 @@
 project(Robocode)
 
 add_library(${PROJECT_NAME})
+add_library(robocode ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC
