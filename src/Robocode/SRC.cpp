@@ -66,6 +66,8 @@ void SRC::resample(const std::span<const float> input, const std::span<float> ou
       src_strerror(error));
   }
 
+  assert_true(src.data.input_frames_used == src.data.input_frames, "Not all src frames are used!");
+
   auto n = static_cast<size_t>(std::max(src.data.output_frames_gen, 0L));
 
   callback({src.buffer.data(), n}, {dst.buffer.data(), n});
@@ -83,6 +85,8 @@ void SRC::resample(const std::span<const float> input, const std::span<float> ou
     throw std::runtime_error(
       src_strerror(error));
   }
+
+  assert_true(dst.data.input_frames_used == dst.data.input_frames, "Not all dst frames are used!");
 
   auto m = static_cast<size_t>(std::max(dst.data.output_frames_gen, 0L));
 
