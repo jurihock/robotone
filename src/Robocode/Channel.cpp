@@ -17,7 +17,6 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
   config.samplerate = samplerate;
   config.concertpitch = concertpitch;
 
-  config.freqs.resize(dftsize);
   config.phase.resize(dftsize);
 }
 
@@ -58,27 +57,22 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
   const double freq = config.freq;
   const double gain = config.gain;
 
-  auto& freqs = config.freqs;
   auto& phase = config.phase;
 
   for (size_t i = 1; i < dft.size() - 1; ++i)
   {
-    const double f0 = pvcfreqs[i];
-    const double f1 = freq * i;
+    const double chnfreq = freq * i;
+    const double pvcfreq = pvcfreqs[i] / dftfreqs[i];
+    const double newfreq = chnfreq * pvcfreq;
 
-    freqs[i] = f1 * f0 / dftfreqs[i];
-  }
+    phase[i] += newfreq * tophase;
 
-  for (size_t i = 1; i < dft.size() - 1; ++i)
-  {
-    phase[i] += freqs[i] * tophase;
-
-    if (freqs[i] <= dftfreqs.front())
+    if (newfreq <= dftfreqs.front())
     {
       continue;
     }
 
-    if (freqs[i] >= dftfreqs.back())
+    if (newfreq >= dftfreqs.back())
     {
       continue;
     }
