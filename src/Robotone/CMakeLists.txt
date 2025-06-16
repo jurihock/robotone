@@ -50,8 +50,7 @@ target_sources(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
     juce_jingles
-    samplerate
-    sdft)
+    Robocode)
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
@@ -66,26 +65,6 @@ target_compile_definitions(${PROJECT_NAME}
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0)
-
-target_compile_features(${PROJECT_NAME}
-  PRIVATE
-    cxx_std_20)
-
-if(FASTMATH)
-
-  message(STATUS "Enabling fast math")
-
-  if(MSVC)
-    target_compile_options(${PROJECT_NAME}
-      PRIVATE
-        /fp:fast)
-  else()
-    target_compile_options(${PROJECT_NAME}
-      PRIVATE
-        -ffast-math)
-  endif()
-
-endif()
 
 if(LOGGING)
 

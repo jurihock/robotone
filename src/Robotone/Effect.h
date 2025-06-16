@@ -2,11 +2,11 @@
 
 #include <JuceHeader.h>
 
-#include <Robotone/DSP/Channels.h>
-#include <Robotone/DSP/Noise.h>
-#include <Robotone/DSP/SDFT.h>
-#include <Robotone/DSP/SRC.h>
-#include <Robotone/DSP/Vocoder.h>
+#include <Robocode/Channels.h>
+#include <Robocode/Noise.h>
+#include <Robocode/SDFT.h>
+#include <Robocode/SRC.h>
+#include <Robocode/Vocoder.h>
 
 class Effect final : public juce::jingles::AudioEffect
 {

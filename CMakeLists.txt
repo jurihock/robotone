@@ -14,4 +14,5 @@ include("${CMAKE_CURRENT_LIST_DIR}/lib/samplerate.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/lib/sdft.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/lib/pluginval.cmake")
 
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/src/Robocode")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/src/Robotone")

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Robotone/DSP/Header.h>
+#include <Robocode/Header.h>
 
 class Channel final
 {

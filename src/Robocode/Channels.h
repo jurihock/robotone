@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Robotone/DSP/Header.h>
-#include <Robotone/DSP/Channel.h>
+#include <Robocode/Header.h>
+#include <Robocode/Channel.h>
 
 class Channels final
 {
