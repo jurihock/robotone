@@ -18,8 +18,6 @@ private:
   const std::vector<double> frequencies;
 
   std::vector<std::complex<double>> cache;
-  std::vector<double> omega;
-  std::vector<double> error;
   std::vector<double> freqs;
 
 };

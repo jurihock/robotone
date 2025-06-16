@@ -7,14 +7,7 @@ Vocoder::Vocoder(const double samplerate, const std::vector<double>& frequencies
   const size_t dftsize = frequencies.size();
 
   cache.resize(dftsize);
-  omega.resize(dftsize);
-  error.resize(dftsize);
   freqs.resize(dftsize);
-
-  for (size_t i = 0; i < dftsize; ++i)
-  {
-    omega[i] = 2 * std::numbers::pi * frequencies[i] / samplerate;
-  }
 }
 
 void Vocoder::analyze(const std::span<const std::complex<double>> dft,
@@ -24,8 +17,9 @@ void Vocoder::analyze(const std::span<const std::complex<double>> dft,
 
   for (size_t i = 0; i < dft.size(); ++i)
   {
-    error[i] = std::arg(dft[i] / cache[i]) - omega[i]; // TODO: approx, wrap
-    freqs[i] = frequencies[i] + error[i] * tofreq;
+    const double phase = std::arg(dft[i] / cache[i]); // TODO: approx, wrap
+
+    freqs[i] = phase * tofreq;
     cache[i] = dft[i];
   }
 
