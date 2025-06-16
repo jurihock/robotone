@@ -20,10 +20,14 @@ Vocoder::Vocoder(const double samplerate, const std::vector<double>& frequencies
 
   const double phase2freq = samplerate / (2 * std::numbers::pi);
 
-  for (size_t i = 0; i < dftsize; ++i)
-  {
-    slope[i] = phase2freq / frequencies[i];
-  }
+  std::transform(
+    frequencies.begin(),
+    frequencies.end(),
+    slope.begin(),
+    [&](const double freq)
+    {
+      return (freq > 0) ? phase2freq / freq : 0;
+    });
 }
 
 void Vocoder::analyze(const std::span<const std::complex<double>> dft,
