@@ -65,6 +65,7 @@ std::unique_ptr<Effect> Processor::createEffect(const size_t channel, const doub
   effect->decimate(parameters.get<bool>("decimate"));
   effect->millis(parameters.get<int>("millis"));
   effect->octave(parameters.get<int>("octave"));
+  effect->gestalt(parameters.get<double>("gestalt"));
   effect->reset();
 
   return effect;
