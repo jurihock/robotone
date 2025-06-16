@@ -17,7 +17,13 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
   config.samplerate = samplerate;
   config.concertpitch = concertpitch;
 
-  config.phase.resize(dftsize);
+  config.chnfreqs.resize(dftsize);
+  config.chnphase.resize(dftsize);
+
+  for (size_t i = 0; i < dftsize; ++i)
+  {
+    config.chnfreqs[i] = hz * i;
+  }
 }
 
 Channel::Channel(const Channel& other) :
@@ -52,20 +58,20 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
 {
   assert_true(dft.size() == config.dftsize, "Invalid DFT size!");
 
-  const double tophase = (2 * std::numbers::pi) / config.samplerate;
+  const double freq2phase = (2 * std::numbers::pi) / config.samplerate;
 
-  const double freq = config.freq;
   const double gain = config.gain;
 
-  auto& phase = config.phase;
+  const auto& chnfreqs = config.chnfreqs;
+  auto& chnphase = config.chnphase;
 
   for (size_t i = 1; i < dft.size() - 1; ++i)
   {
-    const double chnfreq = freq * i;
-    const double pvcfreq = pvcfreqs[i] / dftfreqs[i];
+    const double chnfreq = chnfreqs[i];
+    const double pvcfreq = pvcfreqs[i];
     const double newfreq = chnfreq * pvcfreq;
 
-    phase[i] += newfreq * tophase;
+    chnphase[i] += newfreq * freq2phase;
 
     if (newfreq <= dftfreqs.front())
     {
@@ -77,7 +83,7 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
       continue;
     }
 
-    dft[i] += std::polar(gain, phase[i]);
+    dft[i] += std::polar(gain, chnphase[i]);
   }
 
   return gain;

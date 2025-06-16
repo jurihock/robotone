@@ -33,7 +33,8 @@ private:
     double samplerate;
     double concertpitch;
 
-    std::vector<double> phase;
+    std::vector<double> chnfreqs;
+    std::vector<double> chnphase;
   }
   config;
 

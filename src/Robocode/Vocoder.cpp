@@ -12,11 +12,18 @@ inline double angle(const std::complex<double>& z)
 }
 
 Vocoder::Vocoder(const double samplerate, const std::vector<double>& frequencies) :
-  samplerate(samplerate),
   dftsize(frequencies.size())
 {
   cache.resize(dftsize);
+  slope.resize(dftsize);
   freqs.resize(dftsize);
+
+  const double phase2freq = samplerate / (2 * std::numbers::pi);
+
+  for (size_t i = 0; i < dftsize; ++i)
+  {
+    slope[i] = phase2freq / frequencies[i];
+  }
 }
 
 void Vocoder::analyze(const std::span<const std::complex<double>> dft,
@@ -24,13 +31,11 @@ void Vocoder::analyze(const std::span<const std::complex<double>> dft,
 {
   assert_true(dft.size() == dftsize, "Invalid DFT size!");
 
-  const double tofreq = samplerate / (2 * std::numbers::pi);
-
   for (size_t i = 0; i < dft.size(); ++i)
   {
-    const double phase = angle(dft[i] / cache[i]); // TODO: approx, wrap
+    const double phase = angle(dft[i] / cache[i]); // TODO: wrap
 
-    freqs[i] = phase * tofreq;
+    freqs[i] = phase * slope[i];
     cache[i] = dft[i];
   }
 

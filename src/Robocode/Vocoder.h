@@ -14,10 +14,10 @@ public:
 
 private:
 
-  const double samplerate;
   const size_t dftsize;
 
   std::vector<std::complex<double>> cache;
+  std::vector<double> slope;
   std::vector<double> freqs;
 
 };
