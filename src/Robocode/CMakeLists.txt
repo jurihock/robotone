@@ -26,6 +26,16 @@ target_compile_features(${PROJECT_NAME}
   PUBLIC
     cxx_std_20)
 
+if(FASTATAN)
+
+  message(STATUS "Defining ENABLE_ARCTANGENT_APPROXIMATION")
+
+  target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+      -DENABLE_ARCTANGENT_APPROXIMATION)
+
+endif()
+
 if(FASTMATH)
 
   message(STATUS "Enabling fast math")
