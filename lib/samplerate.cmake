@@ -9,6 +9,10 @@ CPMAddPackage(
 
 if(samplerate_ADDED)
 
+  set(LIBSAMPLERATE_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+  set(LIBSAMPLERATE_INSTALL  OFF CACHE INTERNAL "" FORCE)
+  set(BUILD_TESTING          OFF CACHE INTERNAL "" FORCE)
+
   add_subdirectory(${samplerate_SOURCE_DIR})
 
 endif()
