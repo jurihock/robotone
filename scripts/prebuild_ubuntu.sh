@@ -26,3 +26,5 @@ sudo apt install --yes \
   libxrandr-dev \
   libxrender-dev \
   mesa-common-dev
+
+cmake --version
