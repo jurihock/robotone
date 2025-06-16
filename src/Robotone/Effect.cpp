@@ -98,8 +98,6 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
       output.begin(),
       [&](float x)
       {
-        // x = noise();
-
         float y = sdft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
                                          const std::span<std::complex<double>> dftsynth)
         {

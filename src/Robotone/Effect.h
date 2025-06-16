@@ -50,8 +50,6 @@ private:
   std::unique_ptr<Vocoder> vocoder;
   std::unique_ptr<Channels> channels;
 
-  Noise<float> noise;
-
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Effect)
 
 };
