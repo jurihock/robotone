@@ -65,14 +65,24 @@ void Effect::update(int note, double velocity)
 
 void Effect::dry(const std::span<const float> input, const std::span<float> output)
 {
-  std::transform(
-    input.begin(),
-    input.end(),
-    output.begin(),
-    [&](const float x)
-    {
-      return x; // TODO: latency
-    });
+  src->resample(input, output, [&](const std::span<const float> input,
+                                   const std::span<float> output)
+  {
+    std::transform(
+      input.begin(),
+      input.end(),
+      output.begin(),
+      [&](float x)
+      {
+        float y = sdft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
+                                         const std::span<std::complex<double>> dftsynth)
+        {
+          std::copy(dftanal.begin(), dftanal.end(), dftsynth.begin());
+        });
+
+        return y;
+      });
+  });
 }
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
