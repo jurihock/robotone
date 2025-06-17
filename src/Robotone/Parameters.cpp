@@ -16,10 +16,10 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     juce::AudioParameterIntAttributes().withLabel("ms")));
 
   add("octave", new juce::AudioParameterInt(
-    { "octave", schema }, "Octave shift", -3, +3, 0,
+    { "octave", schema }, "Octave shift", 0, 10, 5,
     juce::AudioParameterIntAttributes()));
 
   add("gestalt", new juce::AudioParameterInt(
-    { "gestalt", schema }, "Robot vs. Human", -1, +1, +1,
+    { "gestalt", schema }, "Robot vs. Human", -1, 1, 1,
     juce::AudioParameterIntAttributes()));
 }
