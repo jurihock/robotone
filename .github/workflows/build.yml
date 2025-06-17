@@ -19,47 +19,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Setup (MacOS)
-        if: matrix.os == 'macos-latest'
+      - if: matrix.os == 'macos-latest'
+        name: Setup (MacOS)
         run: ./scripts/prebuild_macos.sh
 
-      - name: Setup (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-latest'
+        name: Setup (Ubuntu)
         run: ./scripts/prebuild_ubuntu.sh
 
-      - name: Setup (Windows)
-        if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest'
+        name: Setup (Windows)
         run: .\scripts\prebuild_windows.bat
         shell: cmd
 
-      - name: Build (MacOS)
-        if: matrix.os == 'macos-latest'
+      - if: matrix.os == 'macos-latest'
+        name: Build (MacOS)
         run: ./scripts/build_macos.sh
 
-      - name: Build (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-latest'
+        name: Build (Ubuntu)
         run: ./scripts/build_ubuntu.sh
 
-      - name: Build (Windows)
-        if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest'
+        name: Build (Windows)
         run: .\scripts\build_windows.bat
         shell: cmd
 
-      - name: Test (MacOS)
-        if: matrix.os == 'macos-latest'
+      - if: matrix.os == 'macos-latest'
+        name: Test (MacOS)
         run: ./scripts/postbuild_macos.sh
 
-      - name: Test (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-latest'
+        name: Test (Ubuntu)
         run: ./scripts/postbuild_ubuntu.sh
 
-      - name: Test (Windows)
-        if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest'
+        name: Test (Windows)
         run: .\scripts\postbuild_windows.bat
         shell: cmd
 
-      - name: Upload build artefacts
-        if: github.event_name == 'push'
+      - if: github.event_name == 'push'
+        name: Upload build artefacts
         uses: actions/upload-artifact@master
         with:
           name: ${{env.plugin}}-${{matrix.os}}
