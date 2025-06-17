@@ -8,7 +8,7 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     juce::AudioParameterBoolAttributes()));
 
   add("decimate", new juce::AudioParameterBool(
-    { "decimate", schema }, "Downsample", false,
+    { "decimate", schema }, "Downsample", true,
     juce::AudioParameterBoolAttributes()));
 
   add("millis", new juce::AudioParameterInt(
