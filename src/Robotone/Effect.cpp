@@ -22,14 +22,13 @@ int Effect::latency() const
 void Effect::reset()
 {
   const double sr = config.samplerate * (config.decimate ? 0.5 : 1);
-  const double cp = config.concertpitch;
+  const double cp = config.concertpitch * std::pow(2.0, double(config.octave));
 
   const double window = std::max(double(config.millis), 1.0) * sr * 1e-3;
-  const double factor = std::pow(2.0, double(config.octave)) * 0.5;
-  const size_t dftsize = static_cast<size_t>(std::max(window * factor, 1.0));
+  const size_t dftsize = static_cast<size_t>(std::max(window * 0.5, 1.0));
 
-  LOG("Reset millis %d octave %d window %f factor %f dftsize %zu",
-    config.millis, config.octave, window, factor, dftsize);
+  LOG("Reset millis %d octave %d window %f dftsize %zu",
+    config.millis, config.octave, window, dftsize);
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
   sdft = std::make_unique<SDFT>(sr, dftsize);
