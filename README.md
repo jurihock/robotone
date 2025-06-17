@@ -5,7 +5,11 @@
 ![build](https://img.shields.io/github/actions/workflow/status/jurihock/robotone/build.yml?branch=main&label=build)
 ![tag](https://img.shields.io/github/v/tag/jurihock/robotone?color=gold)
 
-The experimental *Robotone* audio effect plugin applies a fixed pitch onto a sound controlled by a [MIDI](https://newt.phys.unsw.edu.au/jw/notes.html) note event. Originally this technique puts zero phase values on every [STFT](https://en.wikipedia.org/wiki/Short-time_Fourier_transform) frame before reconstruction [[1](#1),[2](#2),[3](#3)]. However, the phase zeroing effect is emulated in *Robotone* using the [Sliding DFT](https://en.wikipedia.org/wiki/Sliding_DFT) as implemented in [SDFT](https://github.com/jurihock/sdft). This enables polyphonic usage in a single processing step.
+The experimental *Robotone* audio effect plugin applies a fixed pitch onto a sound controlled by a [MIDI](https://newt.phys.unsw.edu.au/jw/notes.html) note event. Originally this technique puts zero phase values on every [STFT](https://en.wikipedia.org/wiki/Short-time_Fourier_transform) frame before reconstruction [[1](#1),[2](#2),[3](#3)]. However, the phase zeroing effect is emulated in *Robotone* using the [Sliding DFT](https://www.dsprelated.com/showarticle/1396.php) as implemented in [SDFT](https://github.com/jurihock/sdft). This enables polyphonic usage in a single processing step.
+
+The basic idea behind this effect is to reinterpret the frequency axis by replacing the DFT bin frequencies with overtone series as played on a MIDI keyboard. When applied to the input sound, this particular modification produces a robotic sound at a fixed pitch. Additional phase vocoder based corrections result in pitch shifting. Unfortunately, the pitch shifted output signal does not preserve the formants. This issue might be resolved in a future version.
+
+However both effect variants can be used to add a harmonic touch to vocals in a musical way. I suppose so at least...
 
 ## References
 
