@@ -4,8 +4,10 @@ Channel::Channel()
 {
 }
 
-Channel::Channel(const size_t index, const size_t dftsize, const double samplerate, const double concertpitch)
+Channel::Channel(const size_t index, const double samplerate, const std::vector<double>& frequencies, const double concertpitch)
 {
+  const size_t dftsize = frequencies.size();
+
   // https://newt.phys.unsw.edu.au/jw/notes.html
   const double hz = std::pow(2, (double(index) - 69) / 12) * concertpitch;
 
@@ -23,7 +25,7 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
 
   for (size_t i = 0; i < dftsize; ++i)
   {
-    config.chnfreqs[i] = hz * i;
+    config.chnfreqs[i] = (frequencies[i] / samplerate) * hz;
   }
 }
 

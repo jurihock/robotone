@@ -5,7 +5,7 @@ Channels::Channels(const double samplerate, const std::vector<double>& frequenci
 {
   for (size_t i = 0; i < channels.size(); ++i)
   {
-    channels[i] = Channel(i, frequencies.size(), samplerate, concertpitch);
+    channels[i] = Channel(i, samplerate, frequencies, concertpitch);
   }
 
   mask.reserve(channels.size());

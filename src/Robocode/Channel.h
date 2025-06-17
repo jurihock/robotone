@@ -8,7 +8,7 @@ class Channel final
 public:
 
   Channel();
-  Channel(const size_t index, const size_t dftsize, const double samplerate, const double concertpitch);
+  Channel(const size_t index, const double samplerate, const std::vector<double>& frequencies, const double concertpitch);
   Channel(const Channel& other);
   Channel& operator=(const Channel& other);
 
