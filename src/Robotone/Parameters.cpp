@@ -19,8 +19,7 @@ Parameters::Parameters(juce::AudioProcessor& process) :
     { "octave", schema }, "Octave shift", -3, +3, 0,
     juce::AudioParameterIntAttributes()));
 
-  add("gestalt", new juce::AudioParameterFloat(
-    { "gestalt", schema }, "Robot vs. Human",
-    juce::NormalisableRange<float>(-1.0f, +1.0f, 0.1f), 0.0f,
-    juce::AudioParameterFloatAttributes()));
+  add("gestalt", new juce::AudioParameterInt(
+    { "gestalt", schema }, "Robot vs. Human", -1, +1, +1,
+    juce::AudioParameterIntAttributes()));
 }

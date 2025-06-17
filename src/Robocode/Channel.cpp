@@ -18,8 +18,8 @@ Channel::Channel(const size_t index, const size_t dftsize, const double samplera
   config.concertpitch = concertpitch;
 
   config.chnfreqs.resize(dftsize);
-  config.robotphase.resize(dftsize);
-  config.humanphase.resize(dftsize);
+  config.phase[0].resize(dftsize);
+  config.phase[1].resize(dftsize);
 
   for (size_t i = 0; i < dftsize; ++i)
   {
@@ -55,55 +55,77 @@ void Channel::gain(const double gain)
 double Channel::synthesize(const std::span<std::complex<double>> dft,
                            const std::span<const double> dftfreqs,
                            const std::span<const double> pvcfreqs,
-                           const double gestalt)
+                           const int gestalt)
 {
   assert_true(dft.size() == config.dftsize, "Invalid DFT size!");
 
   const double freq2phase = (2 * std::numbers::pi) / config.samplerate;
 
-  const double human = (gestalt + 1) / 2;
-  const double robot = 1 - human;
-
   const double gain = config.gain;
   const auto& chnfreqs = config.chnfreqs;
 
-  auto& robotphase = config.robotphase;
-  auto& humanphase = config.humanphase;
-
-  for (size_t i = 1; i < dft.size() - 1; ++i)
+  auto robotize = [&]()
   {
-    const double chnfreq = chnfreqs[i];
-    const double pvcfreq = pvcfreqs[i];
+    auto& phase = config.phase[0];
 
-    const double robotfreq = chnfreq;
-    const double humanfreq = chnfreq * pvcfreq;
-
-    robotphase[i] += robotfreq * freq2phase;
-    humanphase[i] += humanfreq * freq2phase;
-
-    if (robotfreq <= dftfreqs.front())
+    for (size_t i = 1; i < dft.size() - 1; ++i)
     {
-      continue;
-    }
+      const double newfreq = chnfreqs[i];
 
-    if (robotfreq >= dftfreqs.back())
+      phase[i] += newfreq * freq2phase;
+
+      if (newfreq <= dftfreqs.front())
+      {
+        continue;
+      }
+
+      if (newfreq >= dftfreqs.back())
+      {
+        continue;
+      }
+
+      dft[i] += std::polar(gain, phase[i]);
+    }
+  };
+
+  auto humanize = [&]()
+  {
+    auto& phase = config.phase[1];
+
+    for (size_t i = 1; i < dft.size() - 1; ++i)
     {
-      continue;
-    }
+      const double newfreq = chnfreqs[i] * pvcfreqs[i];
 
-    if (humanfreq <= dftfreqs.front())
-    {
-      continue;
-    }
+      phase[i] += newfreq * freq2phase;
 
-    if (humanfreq >= dftfreqs.back())
-    {
-      continue;
-    }
+      if (newfreq <= dftfreqs.front())
+      {
+        continue;
+      }
 
-    dft[i] += robot * std::polar(gain, robotphase[i]);
-    dft[i] += human * std::polar(gain, humanphase[i]);
+      if (newfreq >= dftfreqs.back())
+      {
+        continue;
+      }
+
+      dft[i] += std::polar(gain, phase[i]);
+    }
+  };
+
+  if (gestalt < 0)
+  {
+    robotize();
+    return gain;
   }
-
-  return gain;
+  else if (gestalt > 0)
+  {
+    humanize();
+    return gain;
+  }
+  else
+  {
+    robotize();
+    humanize();
+    return gain + gain;
+  }
 }

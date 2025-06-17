@@ -23,7 +23,7 @@ public:
   void decimate(bool value);
   void millis(int value);
   void octave(int value);
-  void gestalt(double value);
+  void gestalt(int value);
 
   void update(int note, double velocity);
 
@@ -40,7 +40,7 @@ private:
     bool decimate;
     int millis;
     int octave;
-    double gestalt;
+    int gestalt;
   };
 
   config_t config;

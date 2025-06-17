@@ -53,7 +53,7 @@ void Effect::octave(int value)
   config.octave = value;
 }
 
-void Effect::gestalt(double value)
+void Effect::gestalt(int value)
 {
   config.gestalt = value;
 }
@@ -87,7 +87,7 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
 
 void Effect::wet(const std::span<const float> input, const std::span<float> output)
 {
-  const double gestalt = config.gestalt;
+  const int gestalt = config.gestalt;
 
   src->resample(input, output, [&](const std::span<const float> input,
                                    const std::span<float> output)

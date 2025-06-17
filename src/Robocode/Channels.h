@@ -13,7 +13,7 @@ public:
   void synthesize(const std::span<const std::complex<double>> dftanal,
                   const std::span<std::complex<double>> dftsynth,
                   const std::span<const double> pvcfreqs,
-                  const double gestalt);
+                  const int gestalt);
 
   void update(const int channel, const double gain);
 

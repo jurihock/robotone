@@ -19,7 +19,7 @@ public:
   double synthesize(const std::span<std::complex<double>> dft,
                     const std::span<const double> dftfreqs,
                     const std::span<const double> pvcfreqs,
-                    const double gestalt);
+                    const int gestalt);
 
 private:
 
@@ -34,8 +34,7 @@ private:
     double concertpitch;
 
     std::vector<double> chnfreqs;
-    std::vector<double> robotphase;
-    std::vector<double> humanphase;
+    std::vector<double> phase[2];
   }
   config;
 
