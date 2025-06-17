@@ -6,6 +6,7 @@ env:
   plugin: Robotone
 
 jobs:
+
   build:
     runs-on: ${{matrix.os}}
 
@@ -57,9 +58,25 @@ jobs:
         run: .\scripts\postbuild_windows.bat
         shell: cmd
 
-      - name: Archive build artefacts
+      - name: Upload build artefacts
         if: github.event_name == 'push'
         uses: actions/upload-artifact@master
         with:
           name: ${{env.plugin}}-${{matrix.os}}
           path: ./build/src/${{env.plugin}}/${{env.plugin}}_artefacts/Release
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all build artefacts
+        uses: actions/download-artifact@master
+        with:
+          path: ./artefacts
+
+      - name: Upload all artefacts to GitHub release
+        uses: softprops/action-gh-release@master
+        with:
+          files: ./artefacts/*
