@@ -92,11 +92,14 @@ void Processor::processMidi(const juce::MidiBuffer& midi)
 
     const auto note = msg.getNoteNumber();
     const auto velo = on ? msg.getFloatVelocity() : 0;
+
+    const auto name = juce::MidiMessage::getMidiNoteName(note, true, true, 0).toStdString();
     const auto freq = juce::MidiMessage::getMidiNoteInHertz(note);
 
+    juce::ignoreUnused(name);
     juce::ignoreUnused(freq);
 
-    LOG("MIDI %i %f %f", note, freq, velo);
+    LOG("MIDI %s #%i %ihz %i%%", name.c_str(), note, int(freq), int(velo * 100));
 
     for (size_t i = 0; i < effects.size(); ++i)
     {
