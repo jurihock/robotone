@@ -19,56 +19,56 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - if: matrix.os == 'macos-latest'
-        name: Setup (MacOS)
+      - name: Setup (MacOS)
+        if: matrix.os == 'macos-latest'
         run: ./scripts/prebuild_macos.sh
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Setup (Ubuntu)
+      - name: Setup (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: ./scripts/prebuild_ubuntu.sh
 
-      - if: matrix.os == 'windows-latest'
-        name: Setup (Windows)
+      - name: Setup (Windows)
+        if: matrix.os == 'windows-latest'
         run: .\scripts\prebuild_windows.bat
         shell: cmd
 
-      - if: matrix.os == 'macos-latest'
-        name: Build (MacOS)
+      - name: Build (MacOS)
+        if: matrix.os == 'macos-latest'
         run: ./scripts/build_macos.sh
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Build (Ubuntu)
+      - name: Build (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: ./scripts/build_ubuntu.sh
 
-      - if: matrix.os == 'windows-latest'
-        name: Build (Windows)
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
         run: .\scripts\build_windows.bat
         shell: cmd
 
-      - if: matrix.os == 'macos-latest'
-        name: Test (MacOS)
+      - name: Test (MacOS)
+        if: matrix.os == 'macos-latest'
         run: ./scripts/postbuild_macos.sh
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Test (Ubuntu)
+      - name: Test (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: ./scripts/postbuild_ubuntu.sh
 
-      - if: matrix.os == 'windows-latest'
-        name: Test (Windows)
+      - name: Test (Windows)
+        if: matrix.os == 'windows-latest'
         run: .\scripts\postbuild_windows.bat
         shell: cmd
 
-      - if: github.event_name == 'push'
-        name: Upload build artefacts
+      - name: Upload build artefacts
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@master
         with:
-          name: ${{env.plugin}}-${{matrix.os}}
+          name: ${{env.plugin}}-${{matrix.os}}-${{github.ref_name}}
           path: ./build/src/${{env.plugin}}/${{env.plugin}}_artefacts/Release
 
   release:
-    if: github.ref_type == 'tag'
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
 
     steps:
       - name: Download all build artefacts
