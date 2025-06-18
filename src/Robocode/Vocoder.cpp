@@ -11,7 +11,7 @@ inline double angle(const std::complex<double>& z)
   #endif
 }
 
-Vocoder::Vocoder(const double samplerate, const std::vector<double>& frequencies) :
+Vocoder::Vocoder(const double samplerate, const std::span<const double> frequencies) :
   dftsize(frequencies.size())
 {
   cache.resize(dftsize);

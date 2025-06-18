@@ -1,7 +1,6 @@
 #include <Robocode/Channels.h>
 
-Channels::Channels(const double samplerate, const std::vector<double>& frequencies, const double concertpitch) :
-  frequencies(frequencies)
+Channels::Channels(const double samplerate, const std::span<const double> frequencies, const double concertpitch)
 {
   for (size_t i = 0; i < channels.size(); ++i)
   {
@@ -13,11 +12,10 @@ Channels::Channels(const double samplerate, const std::vector<double>& frequenci
 
 void Channels::synthesize(const std::span<const std::complex<double>> dftanal,
                           const std::span<std::complex<double>> dftsynth,
+                          const std::span<const double> dftfreqs,
                           const std::span<const double> pvcfreqs,
                           const int gestalt)
 {
-  const std::span<const double> dftfreqs(frequencies.data(), frequencies.size());
-
   double sum = 0;
 
   for (size_t channel : mask)

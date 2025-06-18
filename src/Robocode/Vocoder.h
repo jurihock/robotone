@@ -7,7 +7,7 @@ class Vocoder final
 
 public:
 
-  Vocoder(const double samplerate, const std::vector<double>& frequencies);
+  Vocoder(const double samplerate, const std::span<const double> frequencies);
 
   void analyze(const std::span<const std::complex<double>> dft,
                const std::function<void(const std::span<const double> pvcfreqs)> callback);

@@ -4,6 +4,7 @@
 
 #include <Robocode/Channels.h>
 #include <Robocode/Noise.h>
+#include <Robocode/QDFT.h>
 #include <Robocode/SDFT.h>
 #include <Robocode/SRC.h>
 #include <Robocode/Vocoder.h>
@@ -46,7 +47,7 @@ private:
   config_t config;
 
   std::unique_ptr<SRC> src;
-  std::unique_ptr<SDFT> sdft;
+  std::unique_ptr<DFT> dft;
   std::unique_ptr<Vocoder> vocoder;
   std::unique_ptr<Channels> channels;
 

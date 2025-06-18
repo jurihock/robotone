@@ -31,10 +31,12 @@ void Effect::reset()
     config.millis, config.octave, window, dftsize);
 
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
-  sdft = std::make_unique<SDFT>(sr, dftsize);
 
-  vocoder = std::make_unique<Vocoder>(sdft->samplerate(), sdft->frequencies());
-  channels = std::make_unique<Channels>(sdft->samplerate(), sdft->frequencies(), cp);
+  dft = std::make_unique<SDFT>(sr, dftsize);
+  // dft = std::make_unique<QDFT>(sr);
+
+  vocoder = std::make_unique<Vocoder>(dft->samplerate(), dft->frequencies());
+  channels = std::make_unique<Channels>(dft->samplerate(), dft->frequencies(true), cp);
 }
 
 void Effect::decimate(bool value)
@@ -73,8 +75,9 @@ void Effect::dry(const std::span<const float> input, const std::span<float> outp
       output.begin(),
       [&](float x)
       {
-        float y = sdft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
-                                         const std::span<std::complex<double>> dftsynth)
+        float y = dft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
+                                        const std::span<std::complex<double>> dftsynth,
+                                        const std::span<const double> dftfreqs)
         {
           std::copy(dftanal.begin(), dftanal.end(), dftsynth.begin());
         });
@@ -97,12 +100,13 @@ void Effect::wet(const std::span<const float> input, const std::span<float> outp
       output.begin(),
       [&](float x)
       {
-        float y = sdft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
-                                         const std::span<std::complex<double>> dftsynth)
+        float y = dft->transform(x, [&](const std::span<const std::complex<double>> dftanal,
+                                        const std::span<std::complex<double>> dftsynth,
+                                        const std::span<const double> dftfreqs)
         {
           vocoder->analyze(dftanal, [&](const std::span<const double> pvcfreqs)
           {
-            channels->synthesize(dftanal, dftsynth, pvcfreqs, gestalt);
+            channels->synthesize(dftanal, dftsynth, dftfreqs, pvcfreqs, gestalt);
           });
         });
 

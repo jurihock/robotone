@@ -1,10 +1,6 @@
 #include <Robocode/Channel.h>
 
-Channel::Channel()
-{
-}
-
-Channel::Channel(const size_t index, const double samplerate, const std::vector<double>& frequencies, const double concertpitch)
+Channel::Channel(const size_t index, const double samplerate, const std::span<const double> frequencies, const double concertpitch)
 {
   const size_t dftsize = frequencies.size();
 
@@ -25,7 +21,7 @@ Channel::Channel(const size_t index, const double samplerate, const std::vector<
 
   for (size_t i = 0; i < dftsize; ++i)
   {
-    config.chnfreqs[i] = (frequencies[i] / samplerate) * hz;
+    config.chnfreqs[i] = hz * frequencies[i];
   }
 }
 

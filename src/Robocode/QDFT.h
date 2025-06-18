@@ -3,14 +3,15 @@
 #include <Robocode/Header.h>
 #include <Robocode/DFT.h>
 
-#include <sdft/sdft.h>
+#include <qdft/qdft.h>
 
-class SDFT final : public DFT, private sdft::SDFT<float, double>
+class QDFT final : public DFT, private qdft::QDFT<float, double>
 {
 
 public:
 
-  SDFT(const double samplerate, const size_t dftsize);
+  QDFT(const double samplerate);
+  ~QDFT() = default;
 
   size_t size() const override;
   double samplerate() const override;
