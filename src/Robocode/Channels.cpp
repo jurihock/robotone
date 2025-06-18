@@ -23,11 +23,18 @@ void Channels::synthesize(const std::span<const std::complex<double>> dftanal,
     sum += channels[channel].synthesize(dftsynth, dftfreqs, pvcfreqs, gestalt);
   }
 
-  for (size_t i = 1; i < dftfreqs.size() - 1; ++i)
+  if (sum > 0)
   {
-    const double abs = std::abs(dftanal[i]);
+    for (size_t i = 1; i < dftsynth.size() - 1; ++i)
+    {
+      const double abs = std::abs(dftanal[i]);
 
-    dftsynth[i] = (sum > 0) ? (abs / sum) * dftsynth[i] : 0;
+      dftsynth[i] = (abs / sum) * dftsynth[i];
+    }
+  }
+  else
+  {
+    std::fill(dftsynth.begin(), dftsynth.end(), std::complex<double>(0));
   }
 }
 
