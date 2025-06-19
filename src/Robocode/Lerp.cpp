@@ -4,7 +4,8 @@ Lerp::Lerp(const double v, const std::span<const double> x, const std::optional<
 {
   if (x.empty())
   {
-    throw std::invalid_argument("Vector x must be non-empty!");
+    throw std::invalid_argument(
+      "Vector x must be non-empty!");
   }
 
   config.s = x.size();
@@ -70,7 +71,8 @@ double Lerp::operator()(const std::span<const double> y) const
 
   if (y.size() != s)
   {
-    throw std::invalid_argument("Vectors x and y must be the same size!");
+    throw std::invalid_argument(
+      "Vectors x and y must be the same size!");
   }
 
   if (u < 0)
