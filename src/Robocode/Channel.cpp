@@ -4,12 +4,9 @@ Channel::Channel(const size_t index, const double samplerate, const std::span<co
 {
   const size_t dftsize = frequencies.size();
 
-  // https://newt.phys.unsw.edu.au/jw/notes.html
-  const double hz = std::pow(2, (double(index) - 69) / 12) * concertpitch;
-
   config.dftsize = dftsize;
 
-  config.freq = hz;
+  config.freq = midi_to_hertz(index, concertpitch);
   config.gain = 0;
 
   config.samplerate = samplerate;
@@ -21,7 +18,7 @@ Channel::Channel(const size_t index, const double samplerate, const std::span<co
 
   for (size_t i = 0; i < dftsize; ++i)
   {
-    config.chnfreqs[i] = hz * frequencies[i];
+    config.chnfreqs[i] = config.freq * frequencies[i];
   }
 }
 
@@ -57,7 +54,7 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
 {
   assert_true(dft.size() == config.dftsize, "Invalid DFT size!");
 
-  const double freq2phase = (2 * std::numbers::pi) / config.samplerate;
+  const double hz2rad = hertz_to_radian(config.samplerate);
 
   const double gain = config.gain;
   const auto& chnfreqs = config.chnfreqs;
@@ -70,7 +67,7 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
     {
       const double newfreq = chnfreqs[i];
 
-      phase[i] += newfreq * freq2phase;
+      phase[i] += newfreq * hz2rad;
 
       if (newfreq <= dftfreqs.front())
       {
@@ -94,7 +91,7 @@ double Channel::synthesize(const std::span<std::complex<double>> dft,
     {
       const double newfreq = chnfreqs[i] * pvcfreqs[i];
 
-      phase[i] += newfreq * freq2phase;
+      phase[i] += newfreq * hz2rad;
 
       if (newfreq <= dftfreqs.front())
       {

@@ -30,7 +30,7 @@
   while(0)                          //
 
 template<typename... Args>
-static void assert_throw_if(
+inline void assert_throw_if(
   const bool condition,
   const char* expression,
   const char* file,
@@ -51,7 +51,7 @@ static void assert_throw_if(
     va_start(args, format);
 
     va_copy(temp, args);
-    auto size = std::vsnprintf(nullptr, 0, format, temp);
+    int size = std::vsnprintf(nullptr, 0, format, temp);
     va_end(temp);
 
     std::string buffer(size + 1, '\0');

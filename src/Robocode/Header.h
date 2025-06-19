@@ -17,3 +17,4 @@
 #include <vector>
 
 #include <Robocode/Assert.h>
+#include <Robocode/Math.h>

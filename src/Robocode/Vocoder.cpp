@@ -1,16 +1,5 @@
 #include <Robocode/Vocoder.h>
 
-#include <Robocode/Arctangent.h>
-
-inline double angle(const std::complex<double>& z)
-{
-  #if defined(ENABLE_ARCTANGENT_APPROXIMATION)
-    return Arctangent::atan2(z);
-  #else
-    return std::arg(z);
-  #endif
-}
-
 Vocoder::Vocoder(const double samplerate, const std::span<const double> frequencies) :
   dftsize(frequencies.size())
 {
@@ -18,7 +7,7 @@ Vocoder::Vocoder(const double samplerate, const std::span<const double> frequenc
   slope.resize(dftsize);
   freqs.resize(dftsize);
 
-  const double phase2freq = samplerate / (2 * std::numbers::pi);
+  const double rad2hz = radian_to_hertz(samplerate);
 
   std::transform(
     frequencies.begin(),
@@ -26,7 +15,7 @@ Vocoder::Vocoder(const double samplerate, const std::span<const double> frequenc
     slope.begin(),
     [&](const double freq)
     {
-      return (freq > 0) ? phase2freq / freq : 0;
+      return (freq > 0) ? rad2hz / freq : 0;
     });
 }
 

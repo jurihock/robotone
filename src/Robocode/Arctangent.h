@@ -3,6 +3,7 @@
 #include <cmath>
 #include <complex>
 #include <concepts>
+#include <numbers>
 
 /**
  * Arctangent approximation according to [1].
@@ -43,7 +44,7 @@ namespace Arctangent
     const T phi = q + std::copysign(e, s);
 
     // translate the result from [0, 4) to [0, 2pi)
-    return phi * T(1.57079632679489661923);
+    return phi * T(std::numbers::pi / 2);
   }
 
   template<std::floating_point T>
