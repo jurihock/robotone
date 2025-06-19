@@ -31,7 +31,8 @@ inline double radian_to_hertz(const double samplerate)
 }
 
 // https://newt.phys.unsw.edu.au/jw/notes.html
-inline double midi_to_hertz(const double midi, const double concertpitch)
+template<typename T>
+inline double midi_to_hertz(const T midi, const double concertpitch)
 {
-  return std::pow(2, (midi - 69) / 12) * concertpitch;
+  return std::pow(2, (static_cast<double>(midi) - 69) / 12) * concertpitch;
 }
