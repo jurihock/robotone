@@ -34,5 +34,33 @@ inline double radian_to_hertz(const double samplerate)
 template<typename T>
 inline double midi_to_hertz(const T midi, const double concertpitch)
 {
-  return std::pow(2, (static_cast<double>(midi) - 69) / 12) * concertpitch;
+  static const double A4 = 69;
+
+  return std::pow(2, (midi - A4) / 12) * concertpitch;
+}
+
+template<typename T>
+inline double note_to_hertz(const std::string& note, const T octave, const double concertpitch)
+{
+  static const double C0 = std::pow(2, double(-1) * (9 + 4 * 12) / 12);
+
+  static const std::map<std::string, int> notes =
+  {
+    { "C",   0 },
+    { "C#",  1 },
+    { "D",   2 },
+    { "D#",  3 },
+    { "E",   4 },
+    { "F",   5 },
+    { "F#",  6 },
+    { "G",   7 },
+    { "G#",  8 },
+    { "A",   9 },
+    { "A#", 10 },
+    { "B",  11 }
+  };
+
+  const double semitone = notes.at(note);
+
+  return std::pow(2, (semitone / 12) + octave) * C0 * concertpitch;
 }

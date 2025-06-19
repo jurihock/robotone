@@ -10,7 +10,7 @@ class QDFT final : public DFT, private qdft::QDFT<float, double>
 
 public:
 
-  QDFT(const double samplerate);
+  QDFT(const double samplerate, const double concertpitch);
   ~QDFT() = default;
 
   size_t size() const override;

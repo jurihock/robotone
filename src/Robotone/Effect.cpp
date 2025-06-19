@@ -33,7 +33,9 @@ void Effect::reset()
   src = std::make_unique<SRC>(config.samplerate, sr, config.blocksize);
 
   dft = std::make_unique<SDFT>(sr, dftsize);
-  // dft = std::make_unique<QDFT>(sr);
+  // dft = std::make_unique<QDFT>(sr, cp);
+
+  LOG("DEBUG DFT size %zu bw %f %f", dft->size(), dft->frequencies().front(), dft->frequencies().back());
 
   vocoder = std::make_unique<Vocoder>(dft->samplerate(), dft->frequencies());
   channels = std::make_unique<Channels>(dft->samplerate(), dft->frequencies(true), cp);

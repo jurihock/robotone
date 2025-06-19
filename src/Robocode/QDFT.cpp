@@ -1,11 +1,7 @@
 #include <Robocode/QDFT.h>
 
-auto bw1 = std::pow(2, (double(021) - 69) / 12) * 440; // A0 ~ 27.5 Hz
-auto bw2 = std::pow(2, (double(108) - 69) / 12) * 440; // C8 ~ 4186 Hz
-auto bw = std::make_pair(bw1, bw2);
-
-QDFT::QDFT(const double samplerate) :
-  qdft::QDFT<float, double>(samplerate, bw),
+QDFT::QDFT(const double samplerate, const double concertpitch) :
+  qdft::QDFT<float, double>(samplerate, { note_to_hertz("G", 2, concertpitch), 10000 }),
   input(size()),
   output(size())
 {
