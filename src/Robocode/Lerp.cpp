@@ -1,6 +1,6 @@
 #include <Robocode/Lerp.h>
 
-Lerp::Lerp(const double v, const std::span<const double> x, const std::optional<double> z)
+Lerp::Lerp(const std::span<const double> x, const double v, const std::optional<double> z)
 {
   if (x.empty())
   {

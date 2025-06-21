@@ -14,7 +14,7 @@ class Lerp final
 public:
 
   Lerp(){};
-  Lerp(const double v, const std::span<const double> x, const std::optional<double> z = std::nullopt);
+  Lerp(const std::span<const double> x, const double v, const std::optional<double> z = std::nullopt);
   Lerp(const Lerp& other);
   Lerp& operator=(const Lerp& other);
 
@@ -30,6 +30,6 @@ private:
     int u;
     std::optional<double> z;
   }
-  config;
+  config{};
 
 };
